@@ -18,5 +18,5 @@ public class CustomerRequest {
     private String pass;
     private String name;
     private String email;
-    private String mobile;
+    private String phone;
 }

@@ -25,6 +25,4 @@ public class CustomerResponse {
     private LocalDateTime createdAt;
     private List<SubscriptionSummary> subscriptions;
 
-    // The original spec mentioned an extra "response" field without explaining what it is.
-    // Left it out until you decide what it should represent.
 }

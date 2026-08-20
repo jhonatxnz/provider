@@ -28,7 +28,6 @@ public class CustomersController {
 
     private final CustomersService customersService;
 
-    // GET /api/customers/{username}
     @Operation(
             summary = "Get customer information",
             description = "Returns the registration data of the customer identified by username, including their subscriptions."
@@ -45,7 +44,6 @@ public class CustomersController {
         return customersService.getByUsername(username);
     }
 
-    // POST /api/customers
     @Operation(
             summary = "Create a new customer",
             description = "Registers a new customer."
@@ -60,7 +58,6 @@ public class CustomersController {
         return customersService.create(request);
     }
 
-    // PUT /api/customers
     @Operation(
             summary = "Update customer data",
             description = "Updates the registration information of an existing customer."
