@@ -3,8 +3,10 @@ package br.com.jhonatan.provider.service;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.dto.SubscriptionRequest;
 import br.com.jhonatan.provider.dto.SubscriptionSummary;
+import br.com.jhonatan.provider.model.Subscriptions;
 import br.com.jhonatan.provider.model.UserSubscriptions;
 import br.com.jhonatan.provider.model.Users;
+import br.com.jhonatan.provider.repository.SubscriptionsRepository;
 import br.com.jhonatan.provider.repository.UserSubscriptionsRepository;
 import br.com.jhonatan.provider.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
     private final UserSubscriptionsRepository userSubscriptionsRepository;
     private final UsersRepository usersRepository;
+    private final SubscriptionsRepository subscriptionsRepository;
 
     @Override
     public List<SubscriptionSummary> list(String username) {
@@ -26,35 +29,45 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         List<UserSubscriptions> subscriptions = userSubscriptionsRepository.findByUserId(user.getId());
 
         return subscriptions.stream()
-                .map(subscription -> SubscriptionSummary.builder()
-                        .subscription(subscription.getSubscriptions().getName())
-                        .code(subscription.getSubscriptions().getCode())
-                        .createdAt(subscription.getCreatedAt())
-                        .status(subscription.getStatus())
-                        .build())
+                .map(subscription -> {
+                    Subscriptions subscriptionDetails = subscriptionsRepository.findById(subscription.getSubscriptionId())
+                            .orElseThrow(() -> new UnsupportedOperationException("Subscription not found"));
+
+                    return SubscriptionSummary.builder()
+                            .subscription(subscriptionDetails.getName())
+                            .code(subscriptionDetails.getCode())
+                            .createdAt(subscription.getCreatedAt())
+                            .status(subscription.getStatus())
+                            .build();
+                })
                 .toList();
     }
 
     @Override
-    public StatusResponse subscribe(String username, SubscriptionRequest request) {
+    public StatusResponse subscribe(String username, String code) {
         Users user = usersRepository.findByUsername(username).orElseThrow(() -> new UnsupportedOperationException("User not found"));
+
+        Subscriptions subscription = subscriptionsRepository.findByCode(code)
+                .orElseThrow(() -> new UnsupportedOperationException("Subscription not found"));
 
         boolean subscriptionExists = userSubscriptionsRepository.findByUserId(user.getId())
                 .stream()
-                .anyMatch(subscription -> subscription.getSubscriptions().getName().equals(request.getSubscription()));
+                .anyMatch(userSubscription -> userSubscription.getSubscriptionId().equals(subscription.getId()));
 
         if (subscriptionExists) {
             throw new UnsupportedOperationException("Subscription already exists for the user");
         }  else {
 
-//            UserSubscriptions newSubscription = UserSubscriptions.builder()
-//                    .subscriptions(request.)
-//                    .user(user)
-//                    .createdAt(java.time.LocalDateTime.now())
-//                    .status("1") //active
-//                    .email(user.getEmail())
-//                    .phone(user.getPhone())
-//                    .build();
+            UserSubscriptions newSubscription = UserSubscriptions.builder()
+                    .subscriptionId(subscription.getId())
+                    .userId(user.getId())
+                    .createdAt(java.time.LocalDateTime.now())
+                    .status("1") //active
+                    .email(user.getEmail())
+                    .phone(user.getPhone())
+                    .build();
+
+            userSubscriptionsRepository.save(newSubscription);
 
             return StatusResponse.builder()
                     .status("Subscription created successfully")
@@ -77,15 +90,10 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         }
 
 
-        userSubscriptionsRepository.findByUserId(user.getId())
-                .stream()
-                .filter(sub -> sub.getSubscriptions().getId().toString().equals(subscription))
-                .findFirst()
-                .ifPresent(sub -> {
-                    sub.setStatus("0"); //inactive
-                    sub.setCanceledAt(java.time.LocalDateTime.now());
-                    userSubscriptionsRepository.save(sub);
-                });
+        UserSubscriptions subscriptionToCancel = subscriptionExists.getFirst();
+        subscriptionToCancel.setStatus("0"); //canceled
+        subscriptionToCancel.setUpdatedAt(java.time.LocalDateTime.now());
+        userSubscriptionsRepository.save(subscriptionToCancel);
 
         return StatusResponse.builder()
                 .status("Subscription canceled successfully")

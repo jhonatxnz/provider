@@ -9,6 +9,5 @@ import java.util.List;
 
 public interface UserSubscriptionsRepository extends JpaRepository<UserSubscriptions, Long> {
 
-   @Query("SELECT us FROM UserSubscriptions us JOIN FETCH us.subscriptions WHERE us.user.id = :userId")
-    List<UserSubscriptions> findByUserId(@Param("userId") Long userId);
+   List<UserSubscriptions> findByUserId(Long userId);
 }

@@ -24,13 +24,11 @@ public class UserSubscriptions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subscription_id", nullable = false, foreignKey = @ForeignKey(name = "fk_provider_users_subscriptions_subscription"))
-    private Subscriptions subscriptions;
+    @Column(name = "subscription_id", nullable = false)
+    private Long subscriptionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_provider_users_subscriptions_user"))
-    private Users user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

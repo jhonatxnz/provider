@@ -14,4 +14,5 @@ import lombok.Setter;
 public class SubscriptionRequest {
 
     private String subscription;
+    private String code;
 }

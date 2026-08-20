@@ -56,7 +56,7 @@ public class SubscriptionsController {
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
             @PathVariable String username,
             @RequestBody SubscriptionRequest request) {
-        return subscriptionsService.subscribe(username, request);
+        return subscriptionsService.subscribe(username, request.getCode());
     }
 
     @Operation(

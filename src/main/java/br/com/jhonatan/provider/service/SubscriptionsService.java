@@ -10,7 +10,7 @@ public interface SubscriptionsService {
 
     List<SubscriptionSummary> list(String username);
 
-    StatusResponse subscribe(String username, SubscriptionRequest request);
+    StatusResponse subscribe(String username, String code);
 
     StatusResponse cancel(String username, String subscription);
 }
