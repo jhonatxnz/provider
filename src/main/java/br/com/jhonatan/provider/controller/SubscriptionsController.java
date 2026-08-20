@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class SubscriptionsController {
             @ApiResponse(responseCode = "404", description = "Customer or subscription not found")
     })
     @PostMapping
-    public StatusResponse createSubscription(
+    public ResponseEntity<StatusResponse> createSubscription(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
             @PathVariable String username,
             @RequestBody SubscriptionRequest request) {
@@ -69,7 +70,7 @@ public class SubscriptionsController {
             @ApiResponse(responseCode = "404", description = "Customer or subscription not found")
     })
     @DeleteMapping("/{subscription}")
-    public StatusResponse deleteSubscription(
+    public ResponseEntity<StatusResponse> deleteSubscription(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
             @PathVariable String username,
             @Parameter(description = "Subscription code/identifier", example = "PLANO-PREMIUM")

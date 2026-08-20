@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,4 +43,7 @@ public class Users {
 
     @Column(name = "document", length = 20)
     private String document;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }

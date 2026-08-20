@@ -18,5 +18,6 @@ public class SubscriptionSummary {
     private String subscription;
     private String code;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private String status;
 }

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class CustomersController {
 
     @Operation(
             summary = "Get customer information",
-            description = "Returns the registration data of the customer identified by username, including their subscriptions."
+            description = "Returns the registration data of the customer identified by username."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Customer found",
@@ -54,7 +55,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
     @PostMapping
-    public StatusResponse createCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<StatusResponse> createCustomer(@RequestBody CustomerRequest request) {
         return customersService.create(request);
     }
 
@@ -69,7 +70,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PutMapping
-    public StatusResponse updateCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<StatusResponse> updateCustomer(@RequestBody CustomerRequest request) {
         return customersService.update(request);
     }
 }
