@@ -10,20 +10,20 @@ spring:
   # go back to spinning up compose.yaml (MySQL + Kafka) automatically.
   docker:
     compose:
-      enabled: false
+      enabled: true
 
   # --- Datasource: in-memory H2, just to run without Docker/MySQL for now ---
-  datasource:
-    url: jdbc:h2:mem:provider;DB_CLOSE_DELAY=-1
-    username: sa
-    password: ""
-    driver-class-name: org.h2.Driver
+#  datasource:
+#    url: jdbc:h2:mem:provider;DB_CLOSE_DELAY=-1
+#    username: sa
+#    password: ""
+#    driver-class-name: org.h2.Driver
 
   # --- Once Docker is ready, comment out the H2 block above and uncomment this one: ---
-  # datasource:
-  #   url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/provider_db}
-  #   username: ${SPRING_DATASOURCE_USERNAME:provider_user}
-  #   password: ${SPRING_DATASOURCE_PASSWORD:provider_pass}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3308/provider_db}
+    username: ${SPRING_DATASOURCE_USERNAME:provider_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:provider_pass}
 
   jpa:
     open-in-view: false

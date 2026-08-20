@@ -18,7 +18,6 @@ public class CustomerResponse {
 
     private String username;
     private String document;
-    private String pass;
     private String name;
     private String email;
     private String phone;

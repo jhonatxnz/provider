@@ -1,11 +1,6 @@
 package br.com.jhonatan.provider.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,11 +24,13 @@ public class UserSubscriptions {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "subscription_id", nullable = false)
-    private Long subscriptionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subscription_id", nullable = false, foreignKey = @ForeignKey(name = "fk_provider_users_subscriptions_subscription"))
+    private Subscriptions subscriptions;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_provider_users_subscriptions_user"))
+    private Users user;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

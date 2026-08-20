@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class SubscriptionSummary {
 
     private String subscription;
+    private String code;
     private LocalDateTime createdAt;
     private String status;
 }

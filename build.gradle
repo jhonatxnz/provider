@@ -57,6 +57,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'
+
+	developmentOnly('org.springframework.boot:spring-boot-devtools') {
+		exclude group: 'org.springframework.boot', module: 'spring-boot-devtools'
+	}
 }
 
 tasks.named('test') {
