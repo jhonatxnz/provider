@@ -19,15 +19,13 @@ public class CustomersServiceImpl implements CustomersService {
     @Override
     public CustomerResponse getByUsername(String username) {
 
-        Optional<Users> user = usersRepository.findByUsername(username);
-
-        Users result = user.orElseThrow(() -> new UnsupportedOperationException("User not found"));
+        Users user = usersRepository.findByUsername(username).orElseThrow(() -> new UnsupportedOperationException("User not found"));
 
         return CustomerResponse.builder()
-                .username(result.getUsername())
-                .email(result.getEmail())
-                .phone(result.getPhone())
-                .name(result.getName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .name(user.getName())
                 .build();
 
     }
@@ -35,9 +33,7 @@ public class CustomersServiceImpl implements CustomersService {
     @Override
     public StatusResponse create(CustomerRequest request) {
         try{
-            Optional<Users> user = usersRepository.findByUsername(request.getUsername());
-
-            Users result = user.orElseThrow(() -> new UnsupportedOperationException("User not found"));
+            Users user = usersRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UnsupportedOperationException("User not found"));
 
 
             Users updateUser = Users.builder()

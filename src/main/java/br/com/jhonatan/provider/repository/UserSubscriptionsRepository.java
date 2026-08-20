@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface UserSubscriptionsRepository extends JpaRepository<UserSubscriptions, Long> {
 
-    List<UserSubscriptions> findByUsername(String username);
+    List<UserSubscriptions> findByUserId(Long userId);
 }
