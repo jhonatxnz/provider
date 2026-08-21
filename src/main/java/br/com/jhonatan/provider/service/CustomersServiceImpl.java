@@ -58,7 +58,7 @@ public class CustomersServiceImpl implements CustomersService {
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     StatusResponse.builder()
                             .status("success")
-                            .message("User saved successfully")
+                            .message("user saved successfully")
                             .statusCode("201")
                             .build()
             );
@@ -85,7 +85,7 @@ public class CustomersServiceImpl implements CustomersService {
             return ResponseEntity.status(HttpStatus.OK).body(
                     StatusResponse.builder()
                             .status("success")
-                            .message("User updated successfully")
+                            .message("user updated successfully")
                             .statusCode("200")
                             .build()
             );

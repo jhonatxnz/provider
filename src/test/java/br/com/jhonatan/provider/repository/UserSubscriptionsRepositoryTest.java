@@ -9,6 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import util.CustomerCreator;
+import util.SubscriptionCreator;
+import util.UserSubscriptionCreator;
+
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -23,11 +27,11 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Insert association when successful")
     void insert_Association_WhenSuccessful() {
-        Users user = createUser();
+        Users user = CustomerCreator.createValidUser();
 
-        Subscriptions subscription = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        UserSubscriptions userSubscriptionToBeSaved = createUserSubscription(user, subscription);
+        UserSubscriptions userSubscriptionToBeSaved = UserSubscriptionCreator.createUserSubscriptionToBeSaved(user, subscription);
 
         UserSubscriptions savedUserSubscriptions = this.userSubscriptionsRepository.save(userSubscriptionToBeSaved);
 
@@ -43,7 +47,7 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Save throws DataIntegrityViolationException when user is null")
     void save_ThrowsDataIntegrityViolationException_WhenUserIsNull() {
-        Subscriptions subscription = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createSubscriptionToBeSaved();
 
         UserSubscriptions userSubscription = UserSubscriptions.builder()
                 .userId(null)
@@ -60,7 +64,7 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Save throws DataIntegrityViolationException when subscription is null")
     void save_ThrowsDataIntegrityViolationException_WhenSubscriptionIsNull() {
-        Users user = createUser();
+        Users user = CustomerCreator.createUserToBeSaved();
 
         UserSubscriptions userSubscription = UserSubscriptions.builder()
                 .userId(user.getId())
@@ -76,7 +80,7 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Save throws ConstraintViolationException when user not exists")
     void save_ThrowsConstraintViolationException_WhenUserNotExists() {
-        Subscriptions subscription = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createSubscriptionToBeSaved();
 
         UserSubscriptions userSubscription = UserSubscriptions.builder()
                 .userId(2L)
@@ -92,7 +96,7 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Save throws ConstraintViolationException when subscription not exists")
     void save_ThrowsConstraintViolationException_WhenSubscriptionNotExists() {
-        Users user = createUser();
+        Users user = CustomerCreator.createUserToBeSaved();
 
         UserSubscriptions userSubscription = UserSubscriptions.builder()
                 .userId(user.getId())
@@ -108,11 +112,11 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Update association when successful")
     void update_Association_WhenSuccessful() {
-        Users user = createUser();
+        Users user = CustomerCreator.createValidUser();
 
-        Subscriptions subscriptions = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        UserSubscriptions userSubscriptionToBeSaved = createUserSubscription(user, subscriptions);
+        UserSubscriptions userSubscriptionToBeSaved = UserSubscriptionCreator.createUserSubscriptionToBeSaved(user, subscription);
 
         UserSubscriptions savedUserSubscriptions = this.userSubscriptionsRepository.save(userSubscriptionToBeSaved);
 
@@ -131,11 +135,11 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Delete removes association when successful")
     void delete_RemovesAssociation_WhenSuccessful() {
-        Users user = createUser();
+        Users user = CustomerCreator.createValidUser();
 
-        Subscriptions subscriptions = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        UserSubscriptions userSubscriptionToBeSaved = createUserSubscription(user, subscriptions);
+        UserSubscriptions userSubscriptionToBeSaved = UserSubscriptionCreator.createUserSubscriptionToBeSaved(user, subscription);
 
         UserSubscriptions savedUserSubscriptions = this.userSubscriptionsRepository.save(userSubscriptionToBeSaved);
 
@@ -149,48 +153,17 @@ class UserSubscriptionsRepositoryTest {
     @Test
     @DisplayName("Find by user id when successful")
     void findByUserId_WhenSuccessful() {
-        Users user = createUser();
+        Users user = CustomerCreator.createValidUser();
 
-        Subscriptions subscriptions = createSubscription();
+        Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        UserSubscriptions userSubscriptionToBeSaved = createUserSubscription(user, subscriptions);
+        UserSubscriptions userSubscriptionToBeSaved = UserSubscriptionCreator.createUserSubscriptionToBeSaved(user, subscription);
 
         this.userSubscriptionsRepository.save(userSubscriptionToBeSaved);
 
         Assertions.assertThat(this.userSubscriptionsRepository.findByUserId(user.getId())).isNotEmpty();
     }
 
-    private Users createUser() {
-        return Users.builder()
-                .id(1L)
-                .name("Test User")
-                .username("testuser")
-                .phone("1234567890")
-                .email("testuser.example.com")
-                .document("123456789")
-                .createdAt(java.time.LocalDateTime.now())
-                .build();
-    }
-
-    private Subscriptions createSubscription() {
-        return Subscriptions.builder()
-                .id(1L)
-                .name("Subscription Test")
-                .code("SUBSCRIPTION_TEST")
-                .category("Category Test")
-                .description("Description Test")
-                .price(BigDecimal.valueOf(10.0))
-                .status("1")
-                .build();
-    }
-
-    private UserSubscriptions createUserSubscription(Users user, Subscriptions subscription) {
-        return UserSubscriptions.builder()
-                .userId(user.getId())
-                .subscriptionId(subscription.getId())
-                .status("1")
-                .createdAt(java.time.LocalDateTime.now())
-                .build();
-    }
+    
 
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import util.CustomerCreator;
 
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ class UsersRepositoryTest {
     @Test
     @DisplayName("Save creates user when successful")
     void save_PersistUser_WhenSuccessful() {
-        Users userToBeSaved = createUser();
+        Users userToBeSaved = CustomerCreator.createUserToBeSaved();
 
         Users savedUser = this.usersRepository.save(userToBeSaved);
 
@@ -36,7 +37,7 @@ class UsersRepositoryTest {
     @DisplayName("Save updates user when successful")
     void save_UpdatesUser_WhenSuccessful() {
 
-        Users userToBeSaved = createUser();
+        Users userToBeSaved = CustomerCreator.createUserToBeSaved();
 
         Users savedUser = this.usersRepository.save(userToBeSaved);
 
@@ -56,7 +57,7 @@ class UsersRepositoryTest {
     @DisplayName("Delete removes user when successful")
     void delete_RemovesUser_WhenSuccessful() {
 
-        Users userToBeSaved = createUser();
+        Users userToBeSaved = CustomerCreator.createUserToBeSaved();
 
         Users savedUser = this.usersRepository.save(userToBeSaved);
 
@@ -71,7 +72,7 @@ class UsersRepositoryTest {
     @Test
     @DisplayName("Find by username returns user when successful")
     void findByUsername_ReturnsUser_WhenSuccessful() {
-        Users userToBeSaved = createUser();
+        Users userToBeSaved = CustomerCreator.createUserToBeSaved();
 
         Users savedUser = this.usersRepository.save(userToBeSaved);
 
@@ -105,11 +106,4 @@ class UsersRepositoryTest {
 
     }
 
-    private Users createUser() {
-        return Users.builder()
-                .name("Test User")
-                .username("testuser")
-                .createdAt(java.time.LocalDateTime.now())
-                .build();
-    }
 }

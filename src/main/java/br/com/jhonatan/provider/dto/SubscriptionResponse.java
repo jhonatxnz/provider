@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SubscriptionSummary {
+public class SubscriptionResponse {
 
-    private String subscription;
+    private String name;
     private String code;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

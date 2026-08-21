@@ -2,7 +2,7 @@ package br.com.jhonatan.provider.controller;
 
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.dto.SubscriptionRequest;
-import br.com.jhonatan.provider.dto.SubscriptionSummary;
+import br.com.jhonatan.provider.dto.SubscriptionResponse;
 import br.com.jhonatan.provider.service.SubscriptionsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,13 +12,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(RestControllerUrlBase.BASE_URL + "/customers/{username}/subscriptions")
 @Tag(name = "Subscriptions", description = "Subscriptions linked to customers")
@@ -32,13 +36,13 @@ public class SubscriptionsController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of the customer's subscriptions",
-                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = SubscriptionSummary.class)))),
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = SubscriptionResponse.class)))),
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @GetMapping
-    public List<SubscriptionSummary> listSubscriptions(
+    public List<SubscriptionResponse> listSubscriptions(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
-            @PathVariable String username) {
+            @PathVariable @NotBlank String username) {
         return subscriptionsService.list(username);
     }
 
@@ -55,8 +59,8 @@ public class SubscriptionsController {
     @PostMapping
     public ResponseEntity<StatusResponse> createSubscription(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
-            @PathVariable String username,
-            @RequestBody SubscriptionRequest request) {
+            @PathVariable @NotBlank String username,
+            @RequestBody @Valid SubscriptionRequest request) {
         return subscriptionsService.subscribe(username, request.getCode());
     }
 
@@ -72,9 +76,9 @@ public class SubscriptionsController {
     @DeleteMapping("/{subscription}")
     public ResponseEntity<StatusResponse> deleteSubscription(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
-            @PathVariable String username,
+            @PathVariable @NotBlank String username,
             @Parameter(description = "Subscription code/identifier", example = "PLANO-PREMIUM")
-            @PathVariable String subscription) {
-        return subscriptionsService.cancel(username, subscription);
+            @PathVariable @NotBlank String subscriptionCode) {
+        return subscriptionsService.cancel(username, subscriptionCode);
     }
 }

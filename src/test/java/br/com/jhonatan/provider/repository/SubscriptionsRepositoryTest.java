@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import util.SubscriptionCreator;
+
 import java.util.Optional;
 
 @DataJpaTest
@@ -19,7 +21,7 @@ class SubscriptionsRepositoryTest {
     @DisplayName("Save creates subscription when successful")
     void save_PersistSubscription_WhenSuccessful() {
 
-        Subscriptions subscriptionToBeSaved = createSubscription();
+        Subscriptions subscriptionToBeSaved = SubscriptionCreator.createSubscriptionToBeSaved();
 
         Subscriptions savedSubscription = this.subscriptionsRepository.save(subscriptionToBeSaved);
 
@@ -34,7 +36,7 @@ class SubscriptionsRepositoryTest {
     @DisplayName("Save updates subscription when successful")
     void save_UpdatesSubscription_WhenSuccessful() {
 
-        Subscriptions subscriptionToBeSaved = createSubscription();
+        Subscriptions subscriptionToBeSaved = SubscriptionCreator.createSubscriptionToBeSaved();
 
         Subscriptions savedSubscription = this.subscriptionsRepository.save(subscriptionToBeSaved);
 
@@ -54,7 +56,7 @@ class SubscriptionsRepositoryTest {
     @DisplayName("Delete removes subscription when successful")
     void delete_RemovesSubscription_WhenSuccessful() {
 
-        Subscriptions subscriptionToBeSaved = createSubscription();
+        Subscriptions subscriptionToBeSaved = SubscriptionCreator.createSubscriptionToBeSaved();
 
         Subscriptions savedSubscription = this.subscriptionsRepository.save(subscriptionToBeSaved);
 
@@ -70,7 +72,7 @@ class SubscriptionsRepositoryTest {
     @DisplayName("Find by code returns subscription when successful")
     void findByCode_ReturnsSubscription_WhenSuccessful() {
 
-        Subscriptions subscriptionToBeSaved = createSubscription();
+        Subscriptions subscriptionToBeSaved = SubscriptionCreator.createSubscriptionToBeSaved();
 
         Subscriptions savedSubscription = this.subscriptionsRepository.save(subscriptionToBeSaved);
 
@@ -103,14 +105,5 @@ class SubscriptionsRepositoryTest {
         Assertions.assertThatThrownBy(() -> this.subscriptionsRepository.save(subscription))
                 .isInstanceOf(DataIntegrityViolationException.class);
 
-    }
-
-    private Subscriptions createSubscription() {
-
-        return Subscriptions.builder()
-                .name("Subscription Test")
-                .code("SUBSCRIPTION_TEST")
-                .status("1")
-                .build();
     }
 }

@@ -11,8 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping(RestControllerUrlBase.BASE_URL + "/customers")
 @Tag(name = "Customers", description = "Customer registration and lookup")
@@ -41,7 +45,7 @@ public class CustomersController {
     @GetMapping("/{username}")
     public CustomerResponse getCustomer(
             @Parameter(description = "Customer's username", example = "jhonatan.silva")
-            @PathVariable String username) {
+            @PathVariable @NotBlank String username) {
         return customersService.getByUsername(username);
     }
 
@@ -55,7 +59,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
     @PostMapping
-    public ResponseEntity<StatusResponse> createCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<StatusResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
         return customersService.create(request);
     }
 
@@ -70,7 +74,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PutMapping
-    public ResponseEntity<StatusResponse> updateCustomer(@RequestBody CustomerRequest request) {
+    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerRequest request) {
         return customersService.update(request);
     }
 }

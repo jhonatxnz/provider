@@ -1,7 +1,7 @@
 package br.com.jhonatan.provider.service;
 
 import br.com.jhonatan.provider.dto.StatusResponse;
-import br.com.jhonatan.provider.dto.SubscriptionSummary;
+import br.com.jhonatan.provider.dto.SubscriptionResponse;
 import br.com.jhonatan.provider.enums.SubscriptionStatus;
 import br.com.jhonatan.provider.exception.*;
 import br.com.jhonatan.provider.model.Subscriptions;
@@ -25,7 +25,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     private final SubscriptionsRepository subscriptionsRepository;
 
     @Override
-    public List<SubscriptionSummary> list(String username) {
+    public List<SubscriptionResponse> list(String username) {
         Users user = usersRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
         List<UserSubscriptions> subscriptions = userSubscriptionsRepository.findByUserId(user.getId());
@@ -35,8 +35,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                     Subscriptions subscriptionDetails = subscriptionsRepository.findById(subscription.getSubscriptionId())
                             .orElseThrow(SubscriptionNotFound::new);
 
-                    return SubscriptionSummary.builder()
-                            .subscription(subscriptionDetails.getName())
+                    return SubscriptionResponse.builder()
+                            .name(subscriptionDetails.getName())
                             .code(subscriptionDetails.getCode())
                             .createdAt(subscription.getCreatedAt())
                             .status(subscription.getStatus())
@@ -82,7 +82,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> cancel(String username, String subscription) {
+    public ResponseEntity<StatusResponse> cancel(String username, String subscriptionCode) {
         Users user = usersRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
         List<UserSubscriptions> subscriptionExists = userSubscriptionsRepository.findByUserId(user.getId());
@@ -103,7 +103,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         return ResponseEntity.ok(
                 StatusResponse.builder()
                         .status("Subscription canceled successfully")
-                        .message("Subscription " + subscription + " canceled for user " + username)
+                        .message("Subscription " + subscriptionCode + " canceled for user " + username)
                         .status("200")
                         .build()
         );
