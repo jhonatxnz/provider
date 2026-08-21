@@ -17,8 +17,12 @@ import java.util.List;
 public class CustomerResponse {
 
     private String username;
+
     private String document;
+
     private String name;
+
     private String email;
+
     private String phone;
 }

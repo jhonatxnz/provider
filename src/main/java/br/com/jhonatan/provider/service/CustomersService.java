@@ -9,7 +9,7 @@ public interface CustomersService {
 
     CustomerResponse getByUsername(String username);
 
-    ResponseEntity<StatusResponse> create(CustomerRequest request);
+    ResponseEntity<StatusResponse> create(CustomerRequest customerRequest);
 
-    ResponseEntity<StatusResponse> update(CustomerRequest request);
+    ResponseEntity<StatusResponse> update(CustomerRequest customerRequest);
 }

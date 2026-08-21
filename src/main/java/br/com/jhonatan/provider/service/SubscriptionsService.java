@@ -12,5 +12,5 @@ public interface SubscriptionsService {
 
     ResponseEntity<StatusResponse> subscribe(String username, String code);
 
-    ResponseEntity<StatusResponse> cancel(String username, String subscriptionCode);
+    ResponseEntity<StatusResponse> cancel(String username, String code);
 }

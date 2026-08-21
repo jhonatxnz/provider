@@ -39,15 +39,12 @@ public class UserSubscriptions {
     @Column(name = "canceled_at")
     private LocalDateTime canceledAt;
 
-    // '1' - active, '0' - inactive, '2' - block (see the original column COMMENT in the DDL)
     @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    // user's email at the time the subscription was activated
     @Column(name = "email")
     private String email;
 
-    // user's phone at the time the subscription was activated
     @Column(name = "phone", length = 30)
     private String phone;
 }

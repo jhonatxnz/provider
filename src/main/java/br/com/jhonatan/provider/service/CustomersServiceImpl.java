@@ -37,19 +37,19 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> create(CustomerRequest request) {
+    public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
         try{
-            Optional<Users> user = usersRepository.findByUsername(request.getUsername());
+            Optional<Users> user = usersRepository.findByUsername(customerRequest.getUsername());
 
             if (user.isPresent())
                 throw new UserAlreadyExistsException();
 
             Users newUser = Users.builder()
-                    .username(request.getUsername())
-                    .name(request.getName())
-                    .email(request.getEmail())
-                    .phone(request.getPhone())
-                    .document(request.getDocument())
+                    .username(customerRequest.getUsername())
+                    .name(customerRequest.getName())
+                    .email(customerRequest.getEmail())
+                    .phone(customerRequest.getPhone())
+                    .document(customerRequest.getDocument())
                     .createdAt(java.time.LocalDateTime.now())
                     .build();
 
@@ -70,15 +70,15 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> update(CustomerRequest request) {
+    public ResponseEntity<StatusResponse> update(CustomerRequest customerRequest) {
         try{
-            Users user = usersRepository.findByUsername(request.getUsername())
+            Users user = usersRepository.findByUsername(customerRequest.getUsername())
                     .orElseThrow(UserNotFoundException::new);
 
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            user.setPhone(request.getPhone());
-            user.setDocument(request.getDocument());
+            user.setName(customerRequest.getName());
+            user.setEmail(customerRequest.getEmail());
+            user.setPhone(customerRequest.getPhone());
+            user.setDocument(customerRequest.getDocument());
 
             usersRepository.save(user);
 

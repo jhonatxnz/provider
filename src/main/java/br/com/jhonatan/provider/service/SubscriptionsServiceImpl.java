@@ -82,7 +82,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> cancel(String username, String subscriptionCode) {
+    public ResponseEntity<StatusResponse> cancel(String username, String code) {
         Users user = usersRepository.findByUsername(username).orElseThrow(UserNotFoundException::new);
 
         List<UserSubscriptions> subscriptionExists = userSubscriptionsRepository.findByUserId(user.getId());
@@ -103,7 +103,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         return ResponseEntity.ok(
                 StatusResponse.builder()
                         .status("Subscription canceled successfully")
-                        .message("Subscription " + subscriptionCode + " canceled for user " + username)
+                        .message("Subscription " + code + " canceled for user " + username)
                         .status("200")
                         .build()
         );

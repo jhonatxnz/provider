@@ -14,6 +14,8 @@ import lombok.Setter;
 public class StatusResponse {
 
     private String status;
+
     private String message;
+
     private String statusCode;
 }

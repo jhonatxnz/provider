@@ -1,5 +1,6 @@
 package br.com.jhonatan.provider.repository;
 import br.com.jhonatan.provider.model.Users;
+import jakarta.validation.ConstraintViolationException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -102,7 +103,7 @@ class UsersRepositoryTest {
         Users user = new Users();
 
         Assertions.assertThatThrownBy(() -> this.usersRepository.save(user))
-                .isInstanceOf(DataIntegrityViolationException.class);
+                .isInstanceOf(ConstraintViolationException.class);
 
     }
 

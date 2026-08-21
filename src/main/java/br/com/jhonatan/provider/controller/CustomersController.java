@@ -59,8 +59,8 @@ public class CustomersController {
             @ApiResponse(responseCode = "400", description = "Invalid data")
     })
     @PostMapping
-    public ResponseEntity<StatusResponse> createCustomer(@Valid @RequestBody CustomerRequest request) {
-        return customersService.create(request);
+    public ResponseEntity<StatusResponse> createCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
+        return customersService.create(customerRequest);
     }
 
     @Operation(
@@ -74,7 +74,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PutMapping
-    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerRequest request) {
-        return customersService.update(request);
+    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
+        return customersService.update(customerRequest);
     }
 }

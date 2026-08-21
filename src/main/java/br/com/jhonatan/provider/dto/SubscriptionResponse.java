@@ -16,8 +16,12 @@ import java.time.LocalDateTime;
 public class SubscriptionResponse {
 
     private String name;
+
     private String code;
+
     private LocalDateTime createdAt;
+
     private LocalDateTime updatedAt;
+
     private String status;
 }

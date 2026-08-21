@@ -41,7 +41,7 @@ public class SubscriptionsController {
     })
     @GetMapping
     public List<SubscriptionResponse> listSubscriptions(
-            @Parameter(description = "Customer's username", example = "jhonatan.silva")
+            @Parameter(description = "Customer's username", example = "jhonatxnz")
             @PathVariable @NotBlank String username) {
         return subscriptionsService.list(username);
     }
@@ -58,10 +58,10 @@ public class SubscriptionsController {
     })
     @PostMapping
     public ResponseEntity<StatusResponse> createSubscription(
-            @Parameter(description = "Customer's username", example = "jhonatan.silva")
+            @Parameter(description = "Customer's username", example = "jhonatxnz")
             @PathVariable @NotBlank String username,
-            @RequestBody @Valid SubscriptionRequest request) {
-        return subscriptionsService.subscribe(username, request.getCode());
+            @RequestBody @Valid SubscriptionRequest subscriptionRequest) {
+        return subscriptionsService.subscribe(username, subscriptionRequest.getCode());
     }
 
     @Operation(
@@ -75,10 +75,10 @@ public class SubscriptionsController {
     })
     @DeleteMapping("/{subscription}")
     public ResponseEntity<StatusResponse> deleteSubscription(
-            @Parameter(description = "Customer's username", example = "jhonatan.silva")
+            @Parameter(description = "Customer's username", example = "jhonxtnz")
             @PathVariable @NotBlank String username,
             @Parameter(description = "Subscription code/identifier", example = "PLANO-PREMIUM")
-            @PathVariable @NotBlank String subscriptionCode) {
-        return subscriptionsService.cancel(username, subscriptionCode);
+            @PathVariable @NotBlank String code) {
+        return subscriptionsService.cancel(username, code);
     }
 }

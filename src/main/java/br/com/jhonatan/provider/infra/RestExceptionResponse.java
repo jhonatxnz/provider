@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestExceptionResponse {
+
     @JsonProperty("status")
     @Valid
     private String status;
