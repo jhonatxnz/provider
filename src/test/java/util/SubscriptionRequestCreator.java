@@ -3,7 +3,7 @@ package util;
 import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.SubscriptionRequest;
 import br.com.jhonatan.provider.model.Subscriptions;
-import br.com.jhonatan.provider.model.Users;
+import br.com.jhonatan.provider.model.Customers;
 
 public class SubscriptionRequestCreator{
 

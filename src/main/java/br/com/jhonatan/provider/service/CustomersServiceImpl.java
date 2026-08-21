@@ -3,95 +3,86 @@ package br.com.jhonatan.provider.service;
 import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
 import br.com.jhonatan.provider.dto.StatusResponse;
-import br.com.jhonatan.provider.exception.UserAlreadyExistsException;
-import br.com.jhonatan.provider.exception.UserNotFoundException;
-import br.com.jhonatan.provider.model.Users;
-import br.com.jhonatan.provider.repository.UsersRepository;
+import br.com.jhonatan.provider.exception.CustomerAlreadyExistsException;
+import br.com.jhonatan.provider.exception.CustomerNotFoundException;
+import br.com.jhonatan.provider.model.Customers;
+import br.com.jhonatan.provider.repository.CustomersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.text.Normalizer;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CustomersServiceImpl implements CustomersService {
 
-    private final UsersRepository usersRepository;
+    private final CustomersRepository customersRepository;
 
     @Override
     public CustomerResponse getByUsername(String username) {
 
-        Users user = usersRepository.findByUsername(username)
-                .orElseThrow(UserNotFoundException::new);
+        Customers customer = customersRepository.findByUsername(username)
+                .orElseThrow(CustomerNotFoundException::new);
 
         return CustomerResponse.builder()
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .name(user.getName())
-                .document(user.getDocument())
+                .username(customer.getUsername())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
+                .name(customer.getName())
+                .document(customer.getDocument())
                 .build();
 
     }
 
     @Override
     public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
-        try{
-            Optional<Users> user = usersRepository.findByUsername(customerRequest.getUsername());
+        Optional<Customers> customer = customersRepository.findByUsername(customerRequest.getUsername());
 
-            if (user.isPresent())
-                throw new UserAlreadyExistsException();
+        if (customer.isPresent())
+            throw new CustomerAlreadyExistsException();
 
-            Users newUser = Users.builder()
-                    .username(customerRequest.getUsername())
-                    .name(customerRequest.getName())
-                    .email(customerRequest.getEmail())
-                    .phone(customerRequest.getPhone())
-                    .document(customerRequest.getDocument())
-                    .createdAt(java.time.LocalDateTime.now())
-                    .build();
+        Customers newCustomer = Customers.builder()
+                .username(customerRequest.getUsername())
+                .name(customerRequest.getName())
+                .email(customerRequest.getEmail())
+                .phone(customerRequest.getPhone())
+                .document(customerRequest.getDocument())
+                .createdAt(java.time.LocalDateTime.now())
+                .build();
 
-            usersRepository.save(newUser);
+        customersRepository.save(newCustomer);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(
-                    StatusResponse.builder()
-                            .status("success")
-                            .message("user saved successfully")
-                            .statusCode("201")
-                            .build()
-            );
-
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                StatusResponse.builder()
+                        .status("success")
+                        .message("customer saved successfully")
+                        .statusCode("201")
+                        .build()
+        );
     }
 
     @Override
     public ResponseEntity<StatusResponse> update(CustomerRequest customerRequest) {
-        try{
-            Users user = usersRepository.findByUsername(customerRequest.getUsername())
-                    .orElseThrow(UserNotFoundException::new);
+        Customers customer = customersRepository.findByUsername(customerRequest.getUsername())
+                .orElseThrow(CustomerNotFoundException::new);
 
-            user.setName(customerRequest.getName());
-            user.setEmail(customerRequest.getEmail());
-            user.setPhone(customerRequest.getPhone());
-            user.setDocument(customerRequest.getDocument());
+        customer.setName(customerRequest.getName());
+        customer.setEmail(customerRequest.getEmail());
+        customer.setPhone(customerRequest.getPhone());
+        customer.setDocument(customerRequest.getDocument());
 
-            usersRepository.save(user);
+        customersRepository.save(customer);
 
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    StatusResponse.builder()
-                            .status("success")
-                            .message("user updated successfully")
-                            .statusCode("200")
-                            .build()
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+                StatusResponse.builder()
+                        .status("success")
+                        .message("customer updated successfully")
+                        .statusCode("200")
+                        .build()
+        );
     }
 }

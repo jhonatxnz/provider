@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import br.com.jhonatan.provider.model.Users;
+import br.com.jhonatan.provider.model.Customers;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,32 +36,32 @@ class CustomersControllerTest {
     @Test
     @DisplayName("getCustomer returns customer by username when successful")
     void get_ReturnsCustomerByUsername_WhenSuccessful() {
-        Users expectedUser = CustomerCreator.createValidUser();
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
-        CustomerResponse customerResponse = CustomerResponseCreator.createCustomerResponse(expectedUser);
+        CustomerResponse customerResponse = CustomerResponseCreator.createCustomerResponse(expectedCustomer);
 
-        BDDMockito.when(customersServiceMock.getByUsername(expectedUser.getUsername()))
+        BDDMockito.when(customersServiceMock.getByUsername(expectedCustomer.getUsername()))
                 .thenReturn(customerResponse);
 
-        CustomerResponse result = customersController.getCustomer(expectedUser.getUsername());
+        CustomerResponse result = customersController.getCustomer(expectedCustomer.getUsername());
 
         Assertions.assertThat(result).isNotNull();
-        Assertions.assertThat(result.getName()).isEqualTo(expectedUser.getName());
+        Assertions.assertThat(result.getName()).isEqualTo(expectedCustomer.getName());
     }
 
 
     @Test
     @DisplayName("createCustomer returns status response when successful")
     void create_ReturnsStatusResponse_WhenSuccessful() {
-        Users expectedUser = CustomerCreator.createValidUser();
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
-        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedUser);
+        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedCustomer);
 
         BDDMockito.when(customersServiceMock.create(customerRequest)).thenReturn(ResponseEntity.status(HttpStatus.CREATED)
                 .body(StatusResponse
                         .builder()
                         .status("success")
-                        .message("User saved successfully")
+                        .message("Customer saved successfully")
                         .statusCode("201")
                         .build()));
 
@@ -75,15 +75,15 @@ class CustomersControllerTest {
     @Test
     @DisplayName("updateCustomer returns status response when successful")
     void update_ReturnsStatusResponse_WhenSuccessful() {
-        Users expectedUser = CustomerCreator.createValidUser();
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
-        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedUser);
+        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedCustomer);
 
         BDDMockito.when(customersServiceMock.update(customerRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
                 .body(StatusResponse
                         .builder()
                         .status("success")
-                        .message("user updated successfully")
+                        .message("customer updated successfully")
                         .statusCode("200")
                         .build()));
 
@@ -92,5 +92,17 @@ class CustomersControllerTest {
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatusCode()).isEqualTo("200");
     }
+
+    @Test
+    @DisplayName("TODO: test getCustomer propagates CustomerNotFoundException when customer does not exist")
+    void get_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist(){}
+
+    @Test
+    @DisplayName("TODO: test createCustomer propagates CustomerAlreadyExistsException when username is already registered")
+    void create_ThrowsCustomerAlreadyExistsException_WhenUsernameAlreadyExists(){}
+
+    @Test
+    @DisplayName("TODO: test updateCustomer propagates CustomerNotFoundException when customer does not exist")
+    void update_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist(){}
 
 }

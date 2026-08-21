@@ -1,21 +1,21 @@
 package util;
 
-import br.com.jhonatan.provider.model.Users;
+import br.com.jhonatan.provider.model.Customers;
 
 public class CustomerCreator {
 
-    public static Users createUserToBeSaved() {
-        return Users.builder()
-                .name("Test User")
+    public static Customers createCustomerToBeSaved() {
+        return Customers.builder()
+                .name("Test Customer")
                 .username("testuser")
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
     }
 
-    public static Users createValidUser() {
-        return Users.builder()
+    public static Customers createValidCustomer() {
+        return Customers.builder()
                 .id(1L)
-                .name("Test User")
+                .name("Test Customer")
                 .username("testuser")
                 .createdAt(java.time.LocalDateTime.now())
                 .document("12345678900")
@@ -24,10 +24,10 @@ public class CustomerCreator {
                 .build();
     }
 
-    public static Users createValidUpdatedUser() {
-        return Users.builder()
+    public static Customers createValidUpdatedCustomer() {
+        return Customers.builder()
                 .id(1L)
-                .name("Test User updated")
+                .name("Test Customer updated")
                 .username("testuser")
                 .createdAt(java.time.LocalDateTime.now())
                 .build();

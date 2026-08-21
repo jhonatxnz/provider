@@ -1,18 +1,18 @@
 package util;
 
 import br.com.jhonatan.provider.dto.CustomerRequest;
-import br.com.jhonatan.provider.model.Users;
+import br.com.jhonatan.provider.model.Customers;
 
 public class CustomerRequestCreator {
 
-    public static CustomerRequest createCustomerRequest(Users user) {
+    public static CustomerRequest createCustomerRequest(Customers customer) {
 
         return CustomerRequest.builder()
-                .username(user.getUsername())
-                .document(user.getDocument())
-                .name(user.getName())
-                .email(user.getEmail())
-                .phone(user.getPhone())
+                .username(customer.getUsername())
+                .document(customer.getDocument())
+                .name(customer.getName())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
                 .build();
     }
 }

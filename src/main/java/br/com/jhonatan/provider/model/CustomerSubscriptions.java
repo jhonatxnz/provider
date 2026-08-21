@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @Entity
-@Table(name = "users_subscriptions")
-public class UserSubscriptions {
+@Table(name = "customers_subscriptions")
+public class CustomerSubscriptions {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +27,8 @@ public class UserSubscriptions {
     @Column(name = "subscription_id", nullable = false)
     private Long subscriptionId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

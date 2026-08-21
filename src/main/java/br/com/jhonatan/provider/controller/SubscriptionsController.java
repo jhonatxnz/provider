@@ -78,7 +78,7 @@ public class SubscriptionsController {
             @Parameter(description = "Customer's username", example = "jhonxtnz")
             @PathVariable @NotBlank String username,
             @Parameter(description = "Subscription code/identifier", example = "PLANO-PREMIUM")
-            @PathVariable @NotBlank String code) {
+            @PathVariable("subscription") @NotBlank String code) {
         return subscriptionsService.cancel(username, code);
     }
 }

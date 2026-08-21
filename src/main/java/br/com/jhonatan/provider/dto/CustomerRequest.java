@@ -18,11 +18,13 @@ public class CustomerRequest {
     private String name;
 
     @NotBlank
-    private String username;
-
     private String document;
 
+    @NotBlank
     private String email;
 
+    @NotBlank
     private String phone;
+
+    private String username;
 }

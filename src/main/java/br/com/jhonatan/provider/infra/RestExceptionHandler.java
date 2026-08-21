@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
-    protected ResponseEntity<RestExceptionResponse> userNotFoundHandler(UserNotFoundException e) {
+    protected ResponseEntity<RestExceptionResponse> customerNotFoundHandler(CustomerNotFoundException e) {
         return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 new RestExceptionResponse(
                         "error",
@@ -28,7 +28,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<RestExceptionResponse> userAlreadyExistsHandler(UserAlreadyExistsException e) {
+    protected ResponseEntity<RestExceptionResponse> customerAlreadyExistsHandler(CustomerAlreadyExistsException e) {
         return  ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new RestExceptionResponse(
                         "error",
@@ -50,7 +50,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<RestExceptionResponse> userAlreadyHasSubscriptionHandler(UserAlreadyHasSubscription e) {
+    protected ResponseEntity<RestExceptionResponse> customerAlreadyHasSubscriptionHandler(CustomerAlreadyHasSubscription e) {
         return  ResponseEntity.status(HttpStatus.CONFLICT).body(
                 new RestExceptionResponse(
                         "error",
@@ -67,6 +67,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                         "error",
                         e.getMessage(),
                         "409"
+                )
+        );
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> genericExceptionHandler(Exception e) {
+        return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "500"
                 )
         );
     }
