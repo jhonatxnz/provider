@@ -25,6 +25,4 @@ public class CustomerRequest {
 
     @NotBlank
     private String phone;
-
-    private String username;
 }

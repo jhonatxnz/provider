@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +53,12 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         Subscriptions subscription = subscriptionsRepository.findByCode(code)
                 .orElseThrow(SubscriptionNotFound::new);
 
-        boolean subscriptionExists = customerSubscriptionsRepository.findByCustomerId(customer.getId())
+        List<CustomerSubscriptions> customerSubscriptions = customerSubscriptionsRepository.findByCustomerId(customer.getId())
                 .stream()
-                .anyMatch(customerSubscription -> customerSubscription.getSubscriptionId().equals(subscription.getId()));
+                .filter(customerSubscription -> customerSubscription.getSubscriptionId().equals(subscription.getId()))
+                .toList();
 
-        if (subscriptionExists) { //fix when status - 0
+        if (!customerSubscriptions.isEmpty() && Objects.equals(customerSubscriptions.getFirst().getStatus(), "1")) {
             throw new CustomerAlreadyHasSubscription();
         }  else {
 
@@ -64,6 +66,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                     .subscriptionId(subscription.getId())
                     .customerId(customer.getId())
                     .createdAt(java.time.LocalDateTime.now())
+                    .updatedAt(java.time.LocalDateTime.now())
                     .canceledAt(null)
                     .status(SubscriptionStatus.ACTIVE.value())
                     .email(customer.getEmail())

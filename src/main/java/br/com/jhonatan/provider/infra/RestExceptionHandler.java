@@ -72,6 +72,50 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> invalidNameException(InvalidNameException e) {
+        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "400"
+                )
+        );
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> invalidEmailException(InvalidEmailException e) {
+        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "400"
+                )
+        );
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> invalidPhoneException(InvalidPhoneException e) {
+        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "400"
+                )
+        );
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> invalidDocumentException(InvalidDocumentException e) {
+        return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "400"
+                )
+        );
+    }
+
+    @ExceptionHandler
     protected ResponseEntity<RestExceptionResponse> genericExceptionHandler(Exception e) {
         return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new RestExceptionResponse(

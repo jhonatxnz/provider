@@ -2,18 +2,22 @@ package br.com.jhonatan.provider.service;
 
 import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
+import br.com.jhonatan.provider.dto.CustomerUpdateRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.exception.CustomerAlreadyExistsException;
 import br.com.jhonatan.provider.exception.CustomerNotFoundException;
+import br.com.jhonatan.provider.exception.InvalidEmailException;
+import br.com.jhonatan.provider.exception.InvalidNameException;
 import br.com.jhonatan.provider.model.Customers;
 import br.com.jhonatan.provider.repository.CustomersRepository;
+import br.com.jhonatan.provider.utils.DocumentUtils;
+import br.com.jhonatan.provider.utils.EmailUtils;
+import br.com.jhonatan.provider.utils.NameUtils;
+import br.com.jhonatan.provider.utils.PhoneUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.text.Normalizer;
-import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -40,17 +44,29 @@ public class CustomersServiceImpl implements CustomersService {
 
     @Override
     public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
-        Optional<Customers> customer = customersRepository.findByUsername(customerRequest.getUsername());
+        Optional<Customers> customer = customersRepository.findByUsername(customerRequest.getName());
 
         if (customer.isPresent())
             throw new CustomerAlreadyExistsException();
 
+        if (!NameUtils.isValidName(customerRequest.getName()))
+            throw new InvalidNameException();
+
+        if (!EmailUtils.isValidEmail(customerRequest.getEmail()))
+            throw new InvalidEmailException();
+
+        String customerUsername = generateUniqueUsername(customerRequest.getName());
+
+        String customerPhoneNumber = PhoneUtils.normalizePhoneNumber(customerRequest.getPhone());
+
+        String customerDocument = DocumentUtils.cleanDocument(customerRequest.getDocument());
+
         Customers newCustomer = Customers.builder()
-                .username(customerRequest.getUsername())
+                .username(customerUsername)
                 .name(customerRequest.getName())
                 .email(customerRequest.getEmail())
-                .phone(customerRequest.getPhone())
-                .document(customerRequest.getDocument())
+                .phone(customerPhoneNumber)
+                .document(customerDocument)
                 .createdAt(java.time.LocalDateTime.now())
                 .build();
 
@@ -66,14 +82,24 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> update(CustomerRequest customerRequest) {
-        Customers customer = customersRepository.findByUsername(customerRequest.getUsername())
+    public ResponseEntity<StatusResponse> update(CustomerUpdateRequest customerUpdateRequest) {
+        Customers customer = customersRepository.findByUsername(customerUpdateRequest.getUsername())
                 .orElseThrow(CustomerNotFoundException::new);
 
-        customer.setName(customerRequest.getName());
-        customer.setEmail(customerRequest.getEmail());
-        customer.setPhone(customerRequest.getPhone());
-        customer.setDocument(customerRequest.getDocument());
+        if (!NameUtils.isValidName(customerUpdateRequest.getName()))
+            throw new InvalidNameException();
+
+        if (!EmailUtils.isValidEmail(customerUpdateRequest.getEmail()))
+            throw new InvalidEmailException();
+
+        String customerPhoneNumber = PhoneUtils.normalizePhoneNumber(customerUpdateRequest.getPhone());
+
+        String customerDocument = DocumentUtils.cleanDocument(customerUpdateRequest.getDocument());
+
+        customer.setName(customerUpdateRequest.getName());
+        customer.setEmail(customerUpdateRequest.getEmail());
+        customer.setPhone(customerPhoneNumber);
+        customer.setDocument(customerDocument);
 
         customersRepository.save(customer);
 
@@ -84,5 +110,23 @@ public class CustomersServiceImpl implements CustomersService {
                         .statusCode("200")
                         .build()
         );
+    }
+
+    public String generateUniqueUsername(String name) {
+        String[] parts = name.trim().split(" ");
+
+        String firstName = parts[0].toLowerCase();
+        String lastName = parts[parts.length - 1].toLowerCase();
+
+        String baseUsername = firstName + "." + lastName;
+        String username = baseUsername;
+
+        int suffix = 1;
+        while (customersRepository.findByUsername(username).isPresent()) {
+            username = baseUsername + suffix;
+            suffix++;
+        }
+
+        return username;
     }
 }

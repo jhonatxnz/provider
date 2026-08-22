@@ -8,7 +8,6 @@ public class CustomerRequestCreator {
     public static CustomerRequest createCustomerRequest(Customers customer) {
 
         return CustomerRequest.builder()
-                .username(customer.getUsername())
                 .document(customer.getDocument())
                 .name(customer.getName())
                 .email(customer.getEmail())

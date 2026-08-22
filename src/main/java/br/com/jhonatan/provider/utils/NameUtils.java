@@ -1,11 +1,16 @@
 package br.com.jhonatan.provider.utils;
 
-public class UsernameUtils {
-    public static String generateUniqueUsername(String name){
+import java.util.regex.Pattern;
 
-        String username = "";
+public class NameUtils {
 
+    private static final Pattern VALID_NAME_PATTERN =
+            Pattern.compile("^[\\p{L}]{2,}(?: [\\p{L}]{2,})+$");
 
-        return username;
+    public static Boolean isValidName(String name) {
+        if (name == null) {
+            return false;
+        }
+        return VALID_NAME_PATTERN.matcher(name).matches();
     }
 }

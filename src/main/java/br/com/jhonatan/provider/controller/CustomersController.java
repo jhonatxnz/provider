@@ -2,6 +2,7 @@ package br.com.jhonatan.provider.controller;
 
 import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
+import br.com.jhonatan.provider.dto.CustomerUpdateRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.service.CustomersService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -74,7 +75,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
     @PutMapping
-    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
-        return customersService.update(customerRequest);
+    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
+        return customersService.update(customerUpdateRequest); //Alterar para pathvariable
     }
 }

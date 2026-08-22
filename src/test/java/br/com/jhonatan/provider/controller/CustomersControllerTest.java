@@ -2,6 +2,7 @@ package br.com.jhonatan.provider.controller;
 
 import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
+import br.com.jhonatan.provider.dto.CustomerUpdateRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.service.CustomersService;
 import org.assertj.core.api.Assertions;
@@ -19,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import util.CustomerCreator;
 import util.CustomerRequestCreator;
 import util.CustomerResponseCreator;
+import util.CustomerUpdateRequestCreator;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -77,9 +79,9 @@ class CustomersControllerTest {
     void update_ReturnsStatusResponse_WhenSuccessful() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
-        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedCustomer);
+        CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(expectedCustomer);
 
-        BDDMockito.when(customersServiceMock.update(customerRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
+        BDDMockito.when(customersServiceMock.update(customerUpdateRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
                 .body(StatusResponse
                         .builder()
                         .status("success")
@@ -87,7 +89,7 @@ class CustomersControllerTest {
                         .statusCode("200")
                         .build()));
 
-        StatusResponse response = customersController.updateCustomer(customerRequest).getBody();
+        StatusResponse response = customersController.updateCustomer(customerUpdateRequest).getBody();
 
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatusCode()).isEqualTo("200");
