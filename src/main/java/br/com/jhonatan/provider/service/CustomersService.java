@@ -14,5 +14,5 @@ public interface CustomersService {
 
     ResponseEntity<StatusResponse> create(CustomerRequest customerRequest);
 
-    ResponseEntity<StatusResponse> update(String username, CustomerUpdateRequest customerUpdateRequest);
+    ResponseEntity<StatusResponse> update(String document, CustomerUpdateRequest customerUpdateRequest);
 }

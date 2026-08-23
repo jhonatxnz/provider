@@ -45,7 +45,7 @@ public class CustomersController {
     })
     @GetMapping("/{username}")
     public CustomerResponse getCustomer(
-            @Parameter(description = "Customer's username", example = "jhonatan.silva")
+            @Parameter(description = "Customer's username", example = "jhonatan.asd")
             @PathVariable @NotBlank String username) {
         return customersService.getByUsername(username);
     }
@@ -82,7 +82,7 @@ public class CustomersController {
 
     @Operation(
             summary = "Update customer data",
-            description = "Updates the registration information of an existing customer."
+            description = "Updates the registration data information of an existing customer."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Customer updated successfully",
@@ -92,9 +92,9 @@ public class CustomersController {
     })
     @PutMapping("/{username}")
     public ResponseEntity<StatusResponse> updateCustomer(
-            @Parameter(description = "Customer's username", example = "jhonxtnz")
-            @PathVariable @NotBlank String username,
+            @Parameter(description = "Customer's document", example = "12345678900")
+            @PathVariable @NotBlank String document,
             @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
-        return customersService.update(username, customerUpdateRequest);
+        return customersService.update(document, customerUpdateRequest);
     }
 }

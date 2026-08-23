@@ -98,7 +98,7 @@ class CustomersControllerTest {
 
         CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(expectedCustomer);
 
-        BDDMockito.when(customersServiceMock.update(expectedCustomer.getUsername(), customerUpdateRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
+        BDDMockito.when(customersServiceMock.update(expectedCustomer.getDocument(), customerUpdateRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
                 .body(StatusResponse
                         .builder()
                         .status("success")
@@ -157,12 +157,12 @@ class CustomersControllerTest {
 
         CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(expectedCustomer);
 
-        String nonExistentUsername = "nonexistentcustomer";
+        String nonExistentDocument = "00000000000";
 
-        BDDMockito.when(customersServiceMock.update(nonExistentUsername, customerUpdateRequest))
+        BDDMockito.when(customersServiceMock.update(nonExistentDocument, customerUpdateRequest))
                 .thenThrow(new CustomerNotFoundException());
 
-        Assertions.assertThatThrownBy(() -> customersController.updateCustomer(nonExistentUsername, customerUpdateRequest))
+        Assertions.assertThatThrownBy(() -> customersController.updateCustomer(nonExistentDocument, customerUpdateRequest))
                 .isInstanceOf(CustomerNotFoundException.class);
     }
 

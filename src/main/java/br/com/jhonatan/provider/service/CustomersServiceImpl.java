@@ -15,13 +15,18 @@ import br.com.jhonatan.provider.utils.EmailUtils;
 import br.com.jhonatan.provider.utils.NameUtils;
 import br.com.jhonatan.provider.utils.PhoneUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CustomersServiceImpl implements CustomersService {
 
     private final CustomersRepository customersRepository;
@@ -59,6 +64,9 @@ public class CustomersServiceImpl implements CustomersService {
 
     @Override
     public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
+
+        log.info("Starting customer creation");
+
         Optional<Customers> customer = customersRepository.findByDocument(customerRequest.getDocument());
 
         if (customer.isPresent())
@@ -87,6 +95,8 @@ public class CustomersServiceImpl implements CustomersService {
 
         customersRepository.save(newCustomer);
 
+        log.info("Finished customer creation, username created {}", customerUsername);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 StatusResponse.builder()
                         .status("success")
@@ -97,8 +107,11 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> update(String username, CustomerUpdateRequest customerUpdateRequest) {
-        Customers customer = customersRepository.findByUsername(username)
+    public ResponseEntity<StatusResponse> update(String document, CustomerUpdateRequest customerUpdateRequest) {
+
+        log.info("Updating customer with document {}", document);
+
+        Customers customer = customersRepository.findByDocument(document)
                 .orElseThrow(CustomerNotFoundException::new);
 
         if (!NameUtils.isValidName(customerUpdateRequest.getName()))
@@ -118,6 +131,8 @@ public class CustomersServiceImpl implements CustomersService {
 
         customersRepository.save(customer);
 
+        log.info("Finished customer update");
+
         return ResponseEntity.status(HttpStatus.OK).body(
                 StatusResponse.builder()
                         .status("success")
@@ -128,6 +143,9 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     public String generateUniqueUsername(String name) {
+
+        log.info("Generating new username for customer {}", name);
+
         String[] parts = name.trim().split(" ");
 
         String firstName = parts[0].toLowerCase();
@@ -141,6 +159,8 @@ public class CustomersServiceImpl implements CustomersService {
             username = baseUsername + suffix;
             suffix++;
         }
+
+        log.info("Generated username {}", username);
 
         return username;
     }

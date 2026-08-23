@@ -17,7 +17,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("Provider API")
-                        .description("API for customer registration and subscription management")
+                        .description("Main API for subscriptions user's management")
                         .version("v0.0.1")
                         .contact(new Contact().name("Jhonatan Willian dos Santos Silva").email("jw.jhonatan1705@gmail.com"))
                 );
