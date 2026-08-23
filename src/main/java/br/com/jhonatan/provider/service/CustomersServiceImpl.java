@@ -67,7 +67,9 @@ public class CustomersServiceImpl implements CustomersService {
 
         log.info("Starting customer creation");
 
-        Optional<Customers> customer = customersRepository.findByDocument(customerRequest.getDocument());
+        String customerDocument = DocumentUtils.cleanDocument(customerRequest.getDocument());
+
+        Optional<Customers> customer = customersRepository.findByDocument(customerDocument);
 
         if (customer.isPresent())
             throw new CustomerAlreadyExistsException();
@@ -81,8 +83,6 @@ public class CustomersServiceImpl implements CustomersService {
         String customerUsername = generateUniqueUsername(customerRequest.getName());
 
         String customerPhoneNumber = PhoneUtils.normalizePhoneNumber(customerRequest.getPhone());
-
-        String customerDocument = DocumentUtils.cleanDocument(customerRequest.getDocument());
 
         Customers newCustomer = Customers.builder()
                 .username(customerUsername)

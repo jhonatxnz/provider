@@ -3,7 +3,10 @@ package br.com.jhonatan.provider.service;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.dto.SubscriptionResponse;
 import br.com.jhonatan.provider.enums.SubscriptionStatus;
+import br.com.jhonatan.provider.event.SubscriptionCreatedEvent;
+import br.com.jhonatan.provider.event.SubscriptionCanceledEvent;
 import br.com.jhonatan.provider.exception.*;
+import br.com.jhonatan.provider.kafka.producer.SubscriptionEventProducer;
 import br.com.jhonatan.provider.model.Subscriptions;
 import br.com.jhonatan.provider.model.CustomerSubscriptions;
 import br.com.jhonatan.provider.model.Customers;
@@ -24,6 +27,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Transactional
 public class SubscriptionsServiceImpl implements SubscriptionsService {
+
+    private final SubscriptionEventProducer subscriptionEventProducer;
 
     private final CustomerSubscriptionsRepository customerSubscriptionsRepository;
     private final CustomersRepository customersRepository;
@@ -111,6 +116,14 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
             customerSubscriptionsRepository.save(newSubscription);
 
+            subscriptionEventProducer.publishSubscriptionCreated(
+                    SubscriptionCreatedEvent.builder()
+                            .customerEmail(customer.getEmail())
+                            .customerName(customer.getName())
+                            .subscriptionCode(code)
+                            .build()
+            );
+
             log.info("Created {} subscription for customer {}", code, document);
 
             return ResponseEntity.status(201).body(
@@ -149,6 +162,14 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         subscriptionToCancel.setUpdatedAt(java.time.LocalDateTime.now());
 
         customerSubscriptionsRepository.save(subscriptionToCancel);
+
+        subscriptionEventProducer.publishSubscriptionDeleted(
+                SubscriptionCanceledEvent.builder()
+                        .customerEmail(customer.getEmail())
+                        .customerName(customer.getName())
+                        .subscriptionCode(code)
+                        .build()
+        );
 
         log.info("Canceled {} subscription for customer {}", code, document);
 
