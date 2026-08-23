@@ -74,8 +74,11 @@ public class CustomersController {
             @ApiResponse(responseCode = "400", description = "Invalid data"),
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @PutMapping
-    public ResponseEntity<StatusResponse> updateCustomer(@Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
-        return customersService.update(customerUpdateRequest); //Alterar para pathvariable
+    @PutMapping("/{username}")
+    public ResponseEntity<StatusResponse> updateCustomer(
+            @Parameter(description = "Customer's username", example = "jhonxtnz")
+            @PathVariable @NotBlank String username,
+            @Valid @RequestBody CustomerUpdateRequest customerUpdateRequest) {
+        return customersService.update(username, customerUpdateRequest);
     }
 }

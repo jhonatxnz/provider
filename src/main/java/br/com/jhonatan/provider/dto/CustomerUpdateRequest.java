@@ -15,9 +15,6 @@ import lombok.Setter;
 public class CustomerUpdateRequest {
 
     @NotBlank
-    private String username;
-
-    @NotBlank
     private String name;
 
     @NotBlank

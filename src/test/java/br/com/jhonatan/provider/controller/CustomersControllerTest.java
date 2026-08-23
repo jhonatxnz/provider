@@ -4,6 +4,8 @@ import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
 import br.com.jhonatan.provider.dto.CustomerUpdateRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
+import br.com.jhonatan.provider.exception.CustomerAlreadyExistsException;
+import br.com.jhonatan.provider.exception.CustomerNotFoundException;
 import br.com.jhonatan.provider.service.CustomersService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +55,8 @@ class CustomersControllerTest {
 
 
     @Test
-    @DisplayName("createCustomer returns status response when successful")
-    void create_ReturnsStatusResponse_WhenSuccessful() {
+    @DisplayName("createCustomer returns status 201 response when successful")
+    void create_ReturnsStatus201Response_WhenSuccessful() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
         CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedCustomer);
@@ -75,13 +77,13 @@ class CustomersControllerTest {
     }
 
     @Test
-    @DisplayName("updateCustomer returns status response when successful")
-    void update_ReturnsStatusResponse_WhenSuccessful() {
+    @DisplayName("updateCustomer returns status 200 response when successful")
+    void update_ReturnsStatus200Response_WhenSuccessful() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
         CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(expectedCustomer);
 
-        BDDMockito.when(customersServiceMock.update(customerUpdateRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
+        BDDMockito.when(customersServiceMock.update(expectedCustomer.getUsername(), customerUpdateRequest)).thenReturn(ResponseEntity.status(HttpStatus.OK)
                 .body(StatusResponse
                         .builder()
                         .status("success")
@@ -89,22 +91,52 @@ class CustomersControllerTest {
                         .statusCode("200")
                         .build()));
 
-        StatusResponse response = customersController.updateCustomer(customerUpdateRequest).getBody();
+        StatusResponse response = customersController.updateCustomer(expectedCustomer.getUsername(), customerUpdateRequest).getBody();
 
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatusCode()).isEqualTo("200");
     }
 
     @Test
-    @DisplayName("TODO: test getCustomer propagates CustomerNotFoundException when customer does not exist")
-    void get_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist(){}
+    @DisplayName("get propagates CustomerNotFoundException when customer does not exist")
+    void get_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist() {
+        String nonExistentUsername = "nonexistentcustomer";
+
+        BDDMockito.when(customersServiceMock.getByUsername(nonExistentUsername))
+                .thenThrow(new CustomerNotFoundException());
+
+        Assertions.assertThatThrownBy(() -> customersController.getCustomer(nonExistentUsername))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
 
     @Test
-    @DisplayName("TODO: test createCustomer propagates CustomerAlreadyExistsException when username is already registered")
-    void create_ThrowsCustomerAlreadyExistsException_WhenUsernameAlreadyExists(){}
+    @DisplayName("create propagates CustomerAlreadyExistsException when username is already registered")
+    void create_ThrowsCustomerAlreadyExistsException_WhenUsernameAlreadyExists() {
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
+
+        CustomerRequest customerRequest = CustomerRequestCreator.createCustomerRequest(expectedCustomer);
+
+        BDDMockito.when(customersServiceMock.create(customerRequest))
+                .thenThrow(new CustomerAlreadyExistsException());
+
+        Assertions.assertThatThrownBy(() -> customersController.createCustomer(customerRequest))
+                .isInstanceOf(CustomerAlreadyExistsException.class);
+    }
 
     @Test
-    @DisplayName("TODO: test updateCustomer propagates CustomerNotFoundException when customer does not exist")
-    void update_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist(){}
+    @DisplayName("update propagates CustomerNotFoundException when customer does not exist")
+    void update_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist() {
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
+
+        CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(expectedCustomer);
+
+        String nonExistentUsername = "nonexistentcustomer";
+
+        BDDMockito.when(customersServiceMock.update(nonExistentUsername, customerUpdateRequest))
+                .thenThrow(new CustomerNotFoundException());
+
+        Assertions.assertThatThrownBy(() -> customersController.updateCustomer(nonExistentUsername, customerUpdateRequest))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
 
 }

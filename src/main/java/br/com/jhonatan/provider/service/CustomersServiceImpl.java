@@ -82,8 +82,8 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> update(CustomerUpdateRequest customerUpdateRequest) {
-        Customers customer = customersRepository.findByUsername(customerUpdateRequest.getUsername())
+    public ResponseEntity<StatusResponse> update(String username, CustomerUpdateRequest customerUpdateRequest) {
+        Customers customer = customersRepository.findByUsername(username)
                 .orElseThrow(CustomerNotFoundException::new);
 
         if (!NameUtils.isValidName(customerUpdateRequest.getName()))
