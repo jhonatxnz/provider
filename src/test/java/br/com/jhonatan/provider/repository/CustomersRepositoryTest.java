@@ -97,6 +97,32 @@ class CustomersRepositoryTest {
     }
 
     @Test
+    @DisplayName("Find by document returns customer when successful")
+    void findByDocument_ReturnsCustomer_WhenSuccessful() {
+        Customers customerToBeSaved = CustomerCreator.createCustomerToBeSaved();
+
+        Customers savedCustomer = this.customersRepository.save(customerToBeSaved);
+
+        String document = savedCustomer.getDocument();
+
+        Optional<Customers> customer = this.customersRepository.findByDocument(document);
+
+        Assertions.assertThat(customer).isPresent();
+
+        Assertions.assertThat(customer).contains(savedCustomer);
+    }
+
+    @Test
+    @DisplayName("Find by document returns empty when no customer is found")
+    void findByDocument_ReturnsEmpty_WhenSuccessful() {
+
+        Optional<Customers> customer = this.customersRepository.findByDocument("00000000000");
+
+        Assertions.assertThat(customer).isEmpty();
+
+    }
+
+    @Test
     @DisplayName("Save throw ConstraintViolationException when name is empty")
     void save_ThrowDataIntegrityViolationException_WhenNameIsEmpty() {
 

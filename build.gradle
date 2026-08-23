@@ -61,6 +61,9 @@ dependencies {
 	developmentOnly('org.springframework.boot:spring-boot-devtools') {
 		exclude group: 'org.springframework.boot', module: 'spring-boot-devtools'
 	}
+
+	testImplementation 'org.springframework.boot:spring-boot-resttestclient'
+	testImplementation 'org.springframework.boot:spring-boot-starter-restclient'
 }
 
 tasks.named('test') {

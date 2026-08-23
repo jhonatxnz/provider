@@ -30,21 +30,21 @@ public class Customers {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     @NotBlank
     private String name;
 
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(name = "username", nullable = false, length = 20)
     @NotBlank
     private String username;
 
-    @Column(name = "phone", length = 30)
+    @Column(name = "phone", nullable = false, length = 30)
     private String phone;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, length = 60)
     private String email;
 
-    @Column(name = "document", length = 20)
+    @Column(name = "document", nullable = false, length = 20)
     private String document;
 
     @Column(name = "created_at", nullable = false)

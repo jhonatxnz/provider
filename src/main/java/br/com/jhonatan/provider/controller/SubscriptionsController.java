@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping(RestControllerUrlBase.BASE_URL + "/customers/{username}/subscriptions")
+@RequestMapping(RestControllerUrlBase.BASE_URL + "/customers/{document}/subscriptions")
 @Tag(name = "Subscriptions", description = "Subscriptions linked to customers")
 public class SubscriptionsController {
 
@@ -32,7 +32,7 @@ public class SubscriptionsController {
 
     @Operation(
             summary = "List the customer's subscriptions",
-            description = "Returns all subscriptions linked to the customer identified by username."
+            description = "Returns all subscriptions linked to the customer identified by document."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of the customer's subscriptions",
@@ -41,14 +41,14 @@ public class SubscriptionsController {
     })
     @GetMapping
     public List<SubscriptionResponse> listSubscriptions(
-            @Parameter(description = "Customer's username", example = "jhonatxnz")
-            @PathVariable @NotBlank String username) {
-        return subscriptionsService.list(username);
+            @Parameter(description = "Customer's document", example = "000.000.000-00")
+            @PathVariable @NotBlank String document) {
+        return subscriptionsService.list(document);
     }
 
     @Operation(
             summary = "Create a new subscription for the customer",
-            description = "Links a new subscription to the customer identified by username."
+            description = "Links a new subscription to the customer identified by document."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Subscription created successfully",
@@ -58,15 +58,15 @@ public class SubscriptionsController {
     })
     @PostMapping
     public ResponseEntity<StatusResponse> createSubscription(
-            @Parameter(description = "Customer's username", example = "jhonatxnz")
-            @PathVariable @NotBlank String username,
+            @Parameter(description = "Customer's document", example = "000.000.000-00")
+            @PathVariable @NotBlank String document,
             @RequestBody @Valid SubscriptionRequest subscriptionRequest) {
-        return subscriptionsService.subscribe(username, subscriptionRequest.getCode());
+        return subscriptionsService.subscribe(document, subscriptionRequest.getCode());
     }
 
     @Operation(
             summary = "Remove the customer's subscription",
-            description = "Cancels/removes the subscription of the customer identified by username."
+            description = "Cancels/removes the subscription of the customer identified by document."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Subscription removed successfully",
@@ -75,10 +75,10 @@ public class SubscriptionsController {
     })
     @DeleteMapping("/{subscription}")
     public ResponseEntity<StatusResponse> deleteSubscription(
-            @Parameter(description = "Customer's username", example = "jhonxtnz")
-            @PathVariable @NotBlank String username,
+            @Parameter(description = "Customer's document", example = "000.000.000-00")
+            @PathVariable @NotBlank String document,
             @Parameter(description = "Subscription code/identifier", example = "PLANO-PREMIUM")
             @PathVariable("subscription") @NotBlank String code) {
-        return subscriptionsService.cancel(username, code);
+        return subscriptionsService.cancel(document, code);
     }
 }

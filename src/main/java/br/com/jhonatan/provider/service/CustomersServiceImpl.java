@@ -43,8 +43,23 @@ public class CustomersServiceImpl implements CustomersService {
     }
 
     @Override
+    public CustomerResponse getByDocument(String document) {
+
+        Customers customer = customersRepository.findByDocument(document)
+                .orElseThrow(CustomerNotFoundException::new);
+
+        return CustomerResponse.builder()
+                .username(customer.getUsername())
+                .email(customer.getEmail())
+                .phone(customer.getPhone())
+                .name(customer.getName())
+                .document(customer.getDocument())
+                .build();
+    }
+
+    @Override
     public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
-        Optional<Customers> customer = customersRepository.findByUsername(customerRequest.getName());
+        Optional<Customers> customer = customersRepository.findByDocument(customerRequest.getDocument());
 
         if (customer.isPresent())
             throw new CustomerAlreadyExistsException();

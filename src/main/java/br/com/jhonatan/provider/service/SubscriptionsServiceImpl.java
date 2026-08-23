@@ -26,8 +26,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     private final SubscriptionsRepository subscriptionsRepository;
 
     @Override
-    public List<SubscriptionResponse> list(String username) {
-        Customers customer = customersRepository.findByUsername(username).orElseThrow(CustomerNotFoundException::new);
+    public List<SubscriptionResponse> list(String document) {
+        Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
 
         List<CustomerSubscriptions> subscriptions = customerSubscriptionsRepository.findByCustomerId(customer.getId());
 
@@ -47,8 +47,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> subscribe(String username, String code) {
-        Customers customer = customersRepository.findByUsername(username).orElseThrow(CustomerNotFoundException::new);
+    public ResponseEntity<StatusResponse> subscribe(String document, String code) {
+        Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
 
         Subscriptions subscription = subscriptionsRepository.findByCode(code)
                 .orElseThrow(SubscriptionNotFound::new);
@@ -58,10 +58,29 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                 .filter(customerSubscription -> customerSubscription.getSubscriptionId().equals(subscription.getId()))
                 .toList();
 
-        if (!customerSubscriptions.isEmpty() && Objects.equals(customerSubscriptions.getFirst().getStatus(), "1")) {
+        if (!customerSubscriptions.isEmpty() && Objects.equals(customerSubscriptions.getFirst().getStatus(), SubscriptionStatus.ACTIVE.value())) {
             throw new CustomerAlreadyHasSubscription();
-        }  else {
 
+        } else if (!customerSubscriptions.isEmpty() && Objects.equals(customerSubscriptions.getFirst().getStatus(), SubscriptionStatus.INACTIVE.value())) {
+            CustomerSubscriptions existingSubscription = customerSubscriptions.getFirst();
+
+            existingSubscription.setStatus(SubscriptionStatus.ACTIVE.value());
+            existingSubscription.setUpdatedAt(java.time.LocalDateTime.now());
+            existingSubscription.setCanceledAt(null);
+            existingSubscription.setEmail(customer.getEmail());
+            existingSubscription.setPhone(customer.getPhone());
+
+            customerSubscriptionsRepository.save(existingSubscription);
+
+            return ResponseEntity.status(201).body(
+                    StatusResponse.builder()
+                            .status("Subscription reactivated successfully")
+                            .message("Subscription " + code + " reactivated for customer " + document)
+                            .statusCode("201")
+                            .build()
+            );
+
+        } else {
             CustomerSubscriptions newSubscription = CustomerSubscriptions.builder()
                     .subscriptionId(subscription.getId())
                     .customerId(customer.getId())
@@ -78,7 +97,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
             return ResponseEntity.status(201).body(
                     StatusResponse.builder()
                             .status("Subscription created successfully")
-                            .message("Subscription " + code + " created for customer " + username)
+                            .message("Subscription " + code + " created for customer " + document)
                             .statusCode("201")
                             .build()
             );
@@ -86,8 +105,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     }
 
     @Override
-    public ResponseEntity<StatusResponse> cancel(String username, String code) {
-        Customers customer = customersRepository.findByUsername(username).orElseThrow(CustomerNotFoundException::new);
+    public ResponseEntity<StatusResponse> cancel(String document, String code) {
+        Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
 
         Subscriptions subscription = subscriptionsRepository.findByCode(code)
                 .orElseThrow(SubscriptionNotFound::new);
@@ -111,7 +130,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
         return ResponseEntity.ok(
                 StatusResponse.builder()
                         .status("Subscription canceled successfully")
-                        .message("Subscription " + code + " canceled for customer " + username)
+                        .message("Subscription " + code + " canceled for customer " + document)
                         .statusCode("200")
                         .build()
         );

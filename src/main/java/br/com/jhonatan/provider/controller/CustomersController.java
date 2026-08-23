@@ -51,6 +51,22 @@ public class CustomersController {
     }
 
     @Operation(
+            summary = "Get customer information by document",
+            description = "Returns the registration data of the customer identified by document."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Customer found",
+                    content = @Content(schema = @Schema(implementation = CustomerResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Customer not found")
+    })
+    @GetMapping("/document/{document}")
+    public CustomerResponse getCustomerByDocument(
+            @Parameter(description = "Customer's document", example = "12345678900")
+            @PathVariable @NotBlank String document) {
+        return customersService.getByDocument(document);
+    }
+
+    @Operation(
             summary = "Create a new customer",
             description = "Registers a new customer."
     )

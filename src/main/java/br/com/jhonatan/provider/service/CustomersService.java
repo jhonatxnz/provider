@@ -10,6 +10,8 @@ public interface CustomersService {
 
     CustomerResponse getByUsername(String username);
 
+    CustomerResponse getByDocument(String document);
+
     ResponseEntity<StatusResponse> create(CustomerRequest customerRequest);
 
     ResponseEntity<StatusResponse> update(String username, CustomerUpdateRequest customerUpdateRequest);

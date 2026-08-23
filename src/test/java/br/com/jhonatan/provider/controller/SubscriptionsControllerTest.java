@@ -1,6 +1,5 @@
 package br.com.jhonatan.provider.controller;
 
-import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.dto.SubscriptionRequest;
 import br.com.jhonatan.provider.dto.SubscriptionResponse;
@@ -35,18 +34,18 @@ class SubscriptionsControllerTest {
     SubscriptionsService subscriptionsServiceMock;
 
     @Test
-    @DisplayName("listSubscriptions returns list of subscriptions by customer username when successful")
-    void list_ReturnsListOfSubscriptionsByCustomerUsername_WhenSuccessful() {
+    @DisplayName("listSubscriptions returns list of subscriptions by customer document when successful")
+    void list_ReturnsListOfSubscriptionsByCustomerDocument_WhenSuccessful() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
         Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
         SubscriptionResponse expectedResponse = SubscriptionResponseCreator.createSubscriptionResponse(subscription);
 
-        BDDMockito.when(subscriptionsServiceMock.list(expectedCustomer.getUsername()))
+        BDDMockito.when(subscriptionsServiceMock.list(expectedCustomer.getDocument()))
                 .thenReturn(List.of(expectedResponse));
 
-        List<SubscriptionResponse> subscriptionResponse = subscriptionsController.listSubscriptions(expectedCustomer.getUsername());
+        List<SubscriptionResponse> subscriptionResponse = subscriptionsController.listSubscriptions(expectedCustomer.getDocument());
 
         Assertions.assertThat(subscriptionResponse)
                 .isNotEmpty()
@@ -64,7 +63,7 @@ class SubscriptionsControllerTest {
 
         SubscriptionRequest subscriptionRequest = SubscriptionRequestCreator.createSubscriptionRequest(subscription);
 
-        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getUsername(), subscription.getCode())).thenReturn(ResponseEntity.status(HttpStatus.CREATED)
+        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getDocument(), subscription.getCode())).thenReturn(ResponseEntity.status(HttpStatus.CREATED)
                 .body(StatusResponse
                         .builder()
                         .status("success")
@@ -72,7 +71,7 @@ class SubscriptionsControllerTest {
                         .statusCode("201")
                         .build()));
 
-        StatusResponse response = subscriptionsController.createSubscription(customer.getUsername(), subscriptionRequest).getBody();
+        StatusResponse response = subscriptionsController.createSubscription(customer.getDocument(), subscriptionRequest).getBody();
 
         Assertions.assertThat(response).isNotNull();
 
@@ -86,14 +85,14 @@ class SubscriptionsControllerTest {
 
         Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getUsername(), subscription.getCode())).thenReturn(ResponseEntity.ok(
+        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getDocument(), subscription.getCode())).thenReturn(ResponseEntity.ok(
                 StatusResponse.builder()
                         .status("Subscription canceled successfully")
-                        .message("Subscription " + subscription.getName() + " canceled for customer " + customer.getUsername())
+                        .message("Subscription " + subscription.getName() + " canceled for customer " + customer.getDocument())
                         .statusCode("200")
                         .build()));
 
-        StatusResponse response = subscriptionsController.deleteSubscription(customer.getUsername(), subscription.getCode()).getBody();
+        StatusResponse response = subscriptionsController.deleteSubscription(customer.getDocument(), subscription.getCode()).getBody();
 
         Assertions.assertThat(response).isNotNull();
 
@@ -106,10 +105,10 @@ class SubscriptionsControllerTest {
     void list_ReturnsEmptyList_WhenCustomerHasNoSubscriptions() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
-        BDDMockito.when(subscriptionsServiceMock.list(expectedCustomer.getUsername()))
+        BDDMockito.when(subscriptionsServiceMock.list(expectedCustomer.getDocument()))
                 .thenReturn(List.of());
 
-        List<SubscriptionResponse> subscriptionResponse = subscriptionsController.listSubscriptions(expectedCustomer.getUsername());
+        List<SubscriptionResponse> subscriptionResponse = subscriptionsController.listSubscriptions(expectedCustomer.getDocument());
 
         Assertions.assertThat(subscriptionResponse).isEmpty();
     }
@@ -118,12 +117,12 @@ class SubscriptionsControllerTest {
     @DisplayName("list listSubscriptions propagates CustomerNotFoundException when customer does not exist")
     void list_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist(){
 
-        String nonExistentUsername = "nonexistentcustomer";
+        String nonExistentDocument = "00000000000";
 
-        BDDMockito.when(subscriptionsServiceMock.list(nonExistentUsername))
+        BDDMockito.when(subscriptionsServiceMock.list(nonExistentDocument))
                 .thenThrow(new CustomerNotFoundException());
 
-        Assertions.assertThatThrownBy(() -> subscriptionsController.listSubscriptions(nonExistentUsername))
+        Assertions.assertThatThrownBy(() -> subscriptionsController.listSubscriptions(nonExistentDocument))
                 .isInstanceOf(CustomerNotFoundException.class);
     }
 
@@ -136,9 +135,9 @@ class SubscriptionsControllerTest {
 
         SubscriptionRequest subscriptionRequest = SubscriptionRequestCreator.createSubscriptionRequest(subscription);
 
-        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getUsername(), subscription.getCode())).thenThrow(new CustomerAlreadyHasSubscription());
+        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getDocument(), subscription.getCode())).thenThrow(new CustomerAlreadyHasSubscription());
 
-        Assertions.assertThatThrownBy(() -> subscriptionsController.createSubscription(customer.getUsername(), subscriptionRequest))
+        Assertions.assertThatThrownBy(() -> subscriptionsController.createSubscription(customer.getDocument(), subscriptionRequest))
                 .isInstanceOf(CustomerAlreadyHasSubscription.class);
     }
 
@@ -153,10 +152,10 @@ class SubscriptionsControllerTest {
                 .code(nonExistentCode)
                 .build();
 
-        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getUsername(), nonExistentCode))
+        BDDMockito.when(subscriptionsServiceMock.subscribe(customer.getDocument(), nonExistentCode))
                 .thenThrow(new SubscriptionNotFound());
 
-        Assertions.assertThatThrownBy(() -> subscriptionsController.createSubscription(customer.getUsername(), subscriptionRequest))
+        Assertions.assertThatThrownBy(() -> subscriptionsController.createSubscription(customer.getDocument(), subscriptionRequest))
                 .isInstanceOf(SubscriptionNotFound.class);
     }
 
@@ -168,10 +167,10 @@ class SubscriptionsControllerTest {
 
         Subscriptions subscription = SubscriptionCreator.createValidSubscription();
 
-        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getUsername(), subscription.getCode()))
+        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getDocument(), subscription.getCode()))
                 .thenThrow(new SubscriptionAlreadyCanceled());
 
-        Assertions.assertThatThrownBy(() -> subscriptionsController.deleteSubscription(customer.getUsername(), subscription.getCode()))
+        Assertions.assertThatThrownBy(() -> subscriptionsController.deleteSubscription(customer.getDocument(), subscription.getCode()))
                 .isInstanceOf(SubscriptionAlreadyCanceled.class);
     }
 
@@ -182,10 +181,10 @@ class SubscriptionsControllerTest {
 
         String nonExistentCode = "NONEXISTENT_CODE";
 
-        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getUsername(), nonExistentCode))
+        BDDMockito.when(subscriptionsServiceMock.cancel(customer.getDocument(), nonExistentCode))
                 .thenThrow(new SubscriptionNotFound());
 
-        Assertions.assertThatThrownBy(() -> subscriptionsController.deleteSubscription(customer.getUsername(), nonExistentCode))
+        Assertions.assertThatThrownBy(() -> subscriptionsController.deleteSubscription(customer.getDocument(), nonExistentCode))
                 .isInstanceOf(SubscriptionNotFound.class);
     }
 }

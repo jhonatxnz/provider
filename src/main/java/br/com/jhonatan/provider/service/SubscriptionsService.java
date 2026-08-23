@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface SubscriptionsService {
 
-    List<SubscriptionResponse> list(String username);
+    List<SubscriptionResponse> list(String document);
 
-    ResponseEntity<StatusResponse> subscribe(String username, String code);
+    ResponseEntity<StatusResponse> subscribe(String document, String code);
 
-    ResponseEntity<StatusResponse> cancel(String username, String code);
+    ResponseEntity<StatusResponse> cancel(String document, String code);
 }

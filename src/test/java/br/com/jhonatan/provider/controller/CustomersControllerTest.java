@@ -38,8 +38,8 @@ class CustomersControllerTest {
     }
 
     @Test
-    @DisplayName("getCustomer returns customer by username when successful")
-    void get_ReturnsCustomerByUsername_WhenSuccessful() {
+    @DisplayName("getCustomerByUsername returns customer by username when successful")
+    void getByUsername_ReturnsCustomerByUsername_WhenSuccessful() {
         Customers expectedCustomer = CustomerCreator.createValidCustomer();
 
         CustomerResponse customerResponse = CustomerResponseCreator.createCustomerResponse(expectedCustomer);
@@ -53,6 +53,21 @@ class CustomersControllerTest {
         Assertions.assertThat(result.getName()).isEqualTo(expectedCustomer.getName());
     }
 
+    @Test
+    @DisplayName("getCustomerByDocument returns customer by document when successful")
+    void getByDocument_ReturnsCustomerByDocument_WhenSuccessful() {
+        Customers expectedCustomer = CustomerCreator.createValidCustomer();
+
+        CustomerResponse customerResponse = CustomerResponseCreator.createCustomerResponse(expectedCustomer);
+
+        BDDMockito.when(customersServiceMock.getByDocument(expectedCustomer.getDocument()))
+                .thenReturn(customerResponse);
+
+        CustomerResponse result = customersController.getCustomerByDocument(expectedCustomer.getDocument());
+
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result.getName()).isEqualTo(expectedCustomer.getName());
+    }
 
     @Test
     @DisplayName("createCustomer returns status 201 response when successful")
@@ -98,14 +113,26 @@ class CustomersControllerTest {
     }
 
     @Test
-    @DisplayName("get propagates CustomerNotFoundException when customer does not exist")
-    void get_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist() {
+    @DisplayName("getCustomerByUsername propagates CustomerNotFoundException when customer does not exist")
+    void getByUsername_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist() {
         String nonExistentUsername = "nonexistentcustomer";
 
         BDDMockito.when(customersServiceMock.getByUsername(nonExistentUsername))
                 .thenThrow(new CustomerNotFoundException());
 
         Assertions.assertThatThrownBy(() -> customersController.getCustomer(nonExistentUsername))
+                .isInstanceOf(CustomerNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("getCustomerByDocument propagates CustomerNotFoundException when customer does not exist")
+    void getByDocument_ThrowsCustomerNotFoundException_WhenCustomerDoesNotExist() {
+        String nonExistentDocument = "00000000000";
+
+        BDDMockito.when(customersServiceMock.getByDocument(nonExistentDocument))
+                .thenThrow(new CustomerNotFoundException());
+
+        Assertions.assertThatThrownBy(() -> customersController.getCustomerByDocument(nonExistentDocument))
                 .isInstanceOf(CustomerNotFoundException.class);
     }
 

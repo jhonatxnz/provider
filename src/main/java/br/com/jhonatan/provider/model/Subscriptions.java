@@ -35,15 +35,15 @@ public class Subscriptions {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "status", nullable = false, length = 30)
     private String status;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "category", length = 100)
+    @Column(name = "category", nullable = false, length = 100)
     private String category;
 }
