@@ -116,6 +116,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> outlierException(OutLierException e) {
+        return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                new RestExceptionResponse(
+                        "error",
+                        e.getMessage(),
+                        "500"
+                )
+        );
+    }
+
+    @ExceptionHandler
     protected ResponseEntity<RestExceptionResponse> genericExceptionHandler(Exception e) {
         return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new RestExceptionResponse(

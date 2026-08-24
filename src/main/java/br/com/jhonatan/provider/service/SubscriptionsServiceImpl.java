@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Log4j2
 @Service
@@ -34,6 +35,9 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     private final CustomerSubscriptionsRepository customerSubscriptionsRepository;
     private final CustomersRepository customersRepository;
     private final SubscriptionsRepository subscriptionsRepository;
+
+    private final AtomicInteger requestCounter = new AtomicInteger(0);
+
 
     @Override
     public List<SubscriptionResponse> list(String document) {
@@ -61,6 +65,12 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     public ResponseEntity<StatusResponse> subscribe(String document, String code) {
 
         log.info("Starting subscribe process for customer {}, subscription {}", document, code);
+
+        // testing resilience of Consumer API, sending a nonsense error after 4 requisition successfully conclude
+        if (requestCounter.incrementAndGet() % 4 == 0) {
+            log.warn("Simulated failure triggered for customer {}, subscription {}", document, code);
+            throw new OutLierException();
+        }
 
         Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
 
