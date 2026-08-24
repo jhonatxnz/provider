@@ -17,4 +17,9 @@ public class KafkaTopicConfig {
     public NewTopic subscriptionDeletedTopic() {
         return new NewTopic("subscription.canceled", 1, (short) 1);
     }
+
+    @Bean
+    public NewTopic subscriptionReactivatedTopic() {
+        return new NewTopic("subscription.reactivated", 1, (short) 1);
+    }
 }

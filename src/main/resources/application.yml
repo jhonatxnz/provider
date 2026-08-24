@@ -48,3 +48,15 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:email_example@gmail.com} # environment variable configured in ide
+    password: ${MAIL_PASSWORD:password_example} # environment variable configured in ide
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

@@ -5,6 +5,7 @@ import br.com.jhonatan.provider.dto.SubscriptionResponse;
 import br.com.jhonatan.provider.enums.SubscriptionStatus;
 import br.com.jhonatan.provider.event.SubscriptionCreatedEvent;
 import br.com.jhonatan.provider.event.SubscriptionCanceledEvent;
+import br.com.jhonatan.provider.event.SubscriptionReactivatedEvent;
 import br.com.jhonatan.provider.exception.*;
 import br.com.jhonatan.provider.kafka.producer.SubscriptionEventProducer;
 import br.com.jhonatan.provider.model.Subscriptions;
@@ -88,6 +89,14 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
             existingSubscription.setPhone(customer.getPhone());
 
             customerSubscriptionsRepository.save(existingSubscription);
+
+            subscriptionEventProducer.publishSubscriptionReactivated(
+                    SubscriptionReactivatedEvent.builder()
+                            .customerEmail(customer.getEmail())
+                            .customerName(customer.getName())
+                            .subscriptionCode(code)
+                            .build()
+            );
 
             log.info("Reactivated {} subscription for customer {}", code, document);
 
