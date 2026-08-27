@@ -2,15 +2,18 @@ package br.com.jhonatan.provider.service;
 
 import br.com.jhonatan.provider.dto.StatusResponse;
 import br.com.jhonatan.provider.dto.SubscriptionResponse;
+import br.com.jhonatan.provider.enums.Actions;
 import br.com.jhonatan.provider.enums.SubscriptionStatus;
 import br.com.jhonatan.provider.event.SubscriptionCreatedEvent;
 import br.com.jhonatan.provider.event.SubscriptionCanceledEvent;
 import br.com.jhonatan.provider.event.SubscriptionReactivatedEvent;
 import br.com.jhonatan.provider.exception.*;
 import br.com.jhonatan.provider.kafka.producer.SubscriptionEventProducer;
+import br.com.jhonatan.provider.model.CustomerSubscriptionsHistory;
 import br.com.jhonatan.provider.model.Subscriptions;
 import br.com.jhonatan.provider.model.CustomerSubscriptions;
 import br.com.jhonatan.provider.model.Customers;
+import br.com.jhonatan.provider.repository.CustomerSubscriptionsHistoryRepository;
 import br.com.jhonatan.provider.repository.SubscriptionsRepository;
 import br.com.jhonatan.provider.repository.CustomerSubscriptionsRepository;
 import br.com.jhonatan.provider.repository.CustomersRepository;
@@ -22,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -37,6 +41,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     private final CustomerSubscriptionsRepository customerSubscriptionsRepository;
     private final CustomersRepository customersRepository;
     private final SubscriptionsRepository subscriptionsRepository;
+    private final CustomerSubscriptionsHistoryRepository customerSubscriptionsHistoryRepository;
 
     private final AtomicInteger requestCounter = new AtomicInteger(0);
 
@@ -106,6 +111,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
             customerSubscriptionsRepository.save(existingSubscription);
 
+            updateCustomerSubscriptionHistory(existingSubscription, Actions.REACTIVATE);
+
             subscriptionEventProducer.publishSubscriptionReactivated(
                     SubscriptionReactivatedEvent.builder()
                             .customerEmail(customer.getEmail())
@@ -146,6 +153,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                 log.warn("Concurrent subscription creation detected for customer {}, subscription {}", document, code);
                 throw new CustomerAlreadyHasSubscription();
             }
+
+            updateCustomerSubscriptionHistory(newSubscription, Actions.ACTIVATE);
 
             subscriptionEventProducer.publishSubscriptionCreated(
                     SubscriptionCreatedEvent.builder()
@@ -196,6 +205,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
         customerSubscriptionsRepository.save(subscriptionToCancel);
 
+        updateCustomerSubscriptionHistory(subscriptionToCancel, Actions.INACTIVATE);
+
         subscriptionEventProducer.publishSubscriptionCanceled(
                 SubscriptionCanceledEvent.builder()
                         .customerEmail(customer.getEmail())
@@ -213,5 +224,18 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                         .statusCode("200")
                         .build()
         );
+    }
+
+    public void updateCustomerSubscriptionHistory(CustomerSubscriptions customerSubscriptions, Actions action){
+
+        CustomerSubscriptionsHistory customerSubscriptionsHistory = CustomerSubscriptionsHistory.builder()
+                .id(customerSubscriptions.getId())
+                .subscriptionId(customerSubscriptions.getSubscriptionId())
+                .userId(customerSubscriptions.getCustomerId())
+                .action(action.value())
+                .date(LocalDateTime.now())
+                .build();
+
+        customerSubscriptionsHistoryRepository.save(customerSubscriptionsHistory);
     }
 }
