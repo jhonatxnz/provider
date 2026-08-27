@@ -4,11 +4,14 @@ import br.com.jhonatan.provider.dto.CustomerRequest;
 import br.com.jhonatan.provider.dto.CustomerResponse;
 import br.com.jhonatan.provider.dto.CustomerUpdateRequest;
 import br.com.jhonatan.provider.dto.StatusResponse;
+import br.com.jhonatan.provider.enums.SubscriptionStatus;
 import br.com.jhonatan.provider.exception.CustomerAlreadyExistsException;
 import br.com.jhonatan.provider.exception.CustomerNotFoundException;
 import br.com.jhonatan.provider.exception.InvalidEmailException;
 import br.com.jhonatan.provider.exception.InvalidNameException;
+import br.com.jhonatan.provider.model.CustomerSubscriptions;
 import br.com.jhonatan.provider.model.Customers;
+import br.com.jhonatan.provider.repository.CustomerSubscriptionsRepository;
 import br.com.jhonatan.provider.repository.CustomersRepository;
 import br.com.jhonatan.provider.utils.DocumentUtils;
 import br.com.jhonatan.provider.utils.EmailUtils;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Log4j2
@@ -30,6 +34,7 @@ import java.util.Optional;
 public class CustomersServiceImpl implements CustomersService {
 
     private final CustomersRepository customersRepository;
+    private final CustomerSubscriptionsRepository customerSubscriptionsRepository;
 
     @Override
     public CustomerResponse getByUsername(String username) {
@@ -44,7 +49,6 @@ public class CustomersServiceImpl implements CustomersService {
                 .name(customer.getName())
                 .document(customer.getDocument())
                 .build();
-
     }
 
     @Override
@@ -122,21 +126,28 @@ public class CustomersServiceImpl implements CustomersService {
 
         String customerPhoneNumber = PhoneUtils.normalizePhoneNumber(customerUpdateRequest.getPhone());
 
-        String customerDocument = DocumentUtils.cleanDocument(customerUpdateRequest.getDocument());
-
         customer.setName(customerUpdateRequest.getName());
         customer.setEmail(customerUpdateRequest.getEmail());
         customer.setPhone(customerPhoneNumber);
-        customer.setDocument(customerDocument);
 
         customersRepository.save(customer);
+
+        List<CustomerSubscriptions> customerSubscriptions = customerSubscriptionsRepository.findByCustomerIdAndStatus(customer.getId(), SubscriptionStatus.ACTIVE.value());
+
+        for (CustomerSubscriptions activeSubscription  : customerSubscriptions){
+            activeSubscription.setEmail(customerUpdateRequest.getEmail());
+            activeSubscription.setPhone(customerPhoneNumber);
+            activeSubscription.setUpdatedAt(java.time.LocalDateTime.now());
+
+            customerSubscriptionsRepository.save(activeSubscription);
+        }
 
         log.info("Finished customer update");
 
         return ResponseEntity.status(HttpStatus.OK).body(
                 StatusResponse.builder()
                         .status("success")
-                        .message("customer updated successfully")
+                        .message("customer and subscriptions updated successfully")
                         .statusCode("200")
                         .build()
         );
@@ -148,8 +159,8 @@ public class CustomersServiceImpl implements CustomersService {
 
         String[] parts = name.trim().split(" ");
 
-        String firstName = parts[0].toLowerCase();
-        String lastName = parts[parts.length - 1].toLowerCase();
+        String firstName = NameUtils.sanitize(parts[0]);
+        String lastName = NameUtils.sanitize(parts[parts.length - 1]);
 
         String baseUsername = firstName + "." + lastName;
         String username = baseUsername;

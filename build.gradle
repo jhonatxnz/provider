@@ -82,6 +82,20 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+//	prometheus
+//
+//	grafana
+//
+//	opensearch
+//
+//	elasticsearch
+//
+//	authentication
+//
+//  security token
+//
+//  history table
+
 }
 
 tasks.named('test') {

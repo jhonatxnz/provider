@@ -22,34 +22,32 @@ public class DocumentUtils {
             throw new InvalidDocumentException("Invalid document: no valid characters.");
         }
 
+        if (cleaned.length() != 11 && cleaned.length() != 14) {
+            throw new InvalidDocumentException("Invalid document: must contain 11 digits (CPF) or 14 characters (CNPJ).");
+        }
+
         if (cleaned.length() == 11 && !cleaned.matches("\\d{11}")) {
             throw new InvalidDocumentException("Invalid document: CPF must contain only digits.");
         }
 
         if (cleaned.length() == 14 && !cleaned.matches("[A-Z0-9]{12}\\d{2}")) {
-            throw new InvalidDocumentException(
-                    "Invalid document: CNPJ check digits must be numeric.");
+            throw new InvalidDocumentException("Invalid document: CNPJ check digits must be numeric.");
         }
 
         return cleaned;
     }
 
 
-    public static String formatDocument(String document) {
-        String cleaned = cleanDocument(document);
-
-        // Suporte ao caso legado de 15 caracteres (descarta o primeiro).
-        if (cleaned.length() == 15) {
-            cleaned = cleaned.substring(1);
-        }
-
-        if (cleaned.length() == 11) {
-            return cleaned.replaceFirst(CPF_REGEX, CPF_FORMAT);
-        } else if (cleaned.length() == 14) {
-            return cleaned.replaceFirst(CNPJ_REGEX, CNPJ_FORMAT);
-        } else {
-            throw new InvalidDocumentException("Invalid document: incorrect character count.");
-        }
-    }
+//    public static String formatDocument(String document) {
+//        String cleaned = cleanDocument(document);
+//
+//        if (cleaned.length() == 11) {
+//            return cleaned.replaceFirst(CPF_REGEX, CPF_FORMAT);
+//        } else if (cleaned.length() == 14) {
+//            return cleaned.replaceFirst(CNPJ_REGEX, CNPJ_FORMAT);
+//        } else {
+//            throw new InvalidDocumentException("Invalid document: incorrect character count.");
+//        }
+//    }
 
 }

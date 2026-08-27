@@ -1,4 +1,4 @@
-package br.com.jhonatan.provider.infra;
+package br.com.jhonatan.provider.infra.exceptions;
 
 import br.com.jhonatan.provider.exception.*;
 import org.springframework.http.HttpHeaders;

@@ -18,9 +18,6 @@ public class CustomerUpdateRequest {
     private String name;
 
     @NotBlank
-    private String document;
-
-    @NotBlank
     private String email;
 
     @NotBlank

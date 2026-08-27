@@ -17,7 +17,13 @@ import java.time.LocalDateTime;
 @Builder
 @ToString
 @Entity
-@Table(name = "customers_subscriptions")
+@Table(
+        name = "customers_subscriptions",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_customer_subscription",
+                columnNames = {"customer_id", "subscription_id"}
+        )
+)
 public class CustomerSubscriptions {
 
     @Id

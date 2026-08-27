@@ -122,14 +122,13 @@ class CustomerSubscriptionsRepositoryTest {
 
         savedCustomerSubscriptions.setStatus("0");
 
-        CustomerSubscriptions CustomerSubscriptions = this.customerSubscriptionsRepository.save(savedCustomerSubscriptions);
+        CustomerSubscriptions customerSubscriptions = this.customerSubscriptionsRepository.save(savedCustomerSubscriptions);
 
-        Assertions.assertThat(CustomerSubscriptions).isNotNull();
+        Assertions.assertThat(customerSubscriptions).isNotNull();
 
-        Assertions.assertThat(CustomerSubscriptions.getId()).isNotNull();
+        Assertions.assertThat(customerSubscriptions.getId()).isNotNull();
 
-        Assertions.assertThat(CustomerSubscriptions.getStatus()).isEqualTo(savedCustomerSubscriptions.getStatus());
-
+        Assertions.assertThat(customerSubscriptions.getStatus()).isEqualTo(savedCustomerSubscriptions.getStatus());
     }
 
     @Test
@@ -163,7 +162,4 @@ class CustomerSubscriptionsRepositoryTest {
 
         Assertions.assertThat(this.customerSubscriptionsRepository.findByCustomerId(customer.getId())).isNotEmpty();
     }
-
-    
-
 }

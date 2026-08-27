@@ -26,7 +26,7 @@ public class SubscriptionEventProducer {
     }
 
     //Publish the message to topic "subscription.canceled"
-    public void publishSubscriptionDeleted(SubscriptionCanceledEvent event) {
+    public void publishSubscriptionCanceled(SubscriptionCanceledEvent event) {
         log.info("Publishing event to topic {}: {}", TOPIC_CANCELED, event);
         kafkaTemplate.send(TOPIC_CANCELED, event);
     }

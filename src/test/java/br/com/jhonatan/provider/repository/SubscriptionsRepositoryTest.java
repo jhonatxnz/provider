@@ -49,7 +49,6 @@ class SubscriptionsRepositoryTest {
         Assertions.assertThat(updatedSubscription.getId()).isNotNull();
 
         Assertions.assertThat(updatedSubscription.getName()).isEqualTo(savedSubscription.getName());
-
     }
 
     @Test
@@ -65,13 +64,11 @@ class SubscriptionsRepositoryTest {
         Optional<Subscriptions> subscriptionsOptional = this.subscriptionsRepository.findById(savedSubscription.getId());
 
         Assertions.assertThat(subscriptionsOptional).isEmpty();
-
     }
 
     @Test
     @DisplayName("Find by code returns subscription when successful")
     void findByCode_ReturnsSubscription_WhenSuccessful() {
-
         Subscriptions subscriptionToBeSaved = SubscriptionCreator.createSubscriptionToBeSaved();
 
         Subscriptions savedSubscription = this.subscriptionsRepository.save(subscriptionToBeSaved);
@@ -83,27 +80,22 @@ class SubscriptionsRepositoryTest {
         Assertions.assertThat(subscriptions).isNotEmpty();
 
         Assertions.assertThat(subscriptions).contains(savedSubscription);
-
     }
 
     @Test
     @DisplayName("Find by code returns empty when no subscription is found")
     void findByCode_ReturnsEmpty_WhenSuccessful() {
-
         Optional<Subscriptions> subscriptions = this.subscriptionsRepository.findByCode("NotExistingCode");
 
         Assertions.assertThat(subscriptions).isEmpty();
-
     }
 
     @Test
     @DisplayName("Save throw ConstraintViolationException when code is empty")
     void save_ThrowDataIntegrityViolationException_WhenCodeIsEmpty() {
-
         Subscriptions subscription = new Subscriptions();
 
         Assertions.assertThatThrownBy(() -> this.subscriptionsRepository.save(subscription))
                 .isInstanceOf(DataIntegrityViolationException.class);
-
     }
 }

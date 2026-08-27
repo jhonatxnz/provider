@@ -90,7 +90,7 @@ public class CustomersController {
             @ApiResponse(responseCode = "400", description = "Invalid data"),
             @ApiResponse(responseCode = "404", description = "Customer not found")
     })
-    @PutMapping("/{username}")
+    @PutMapping("/{document}")
     public ResponseEntity<StatusResponse> updateCustomer(
             @Parameter(description = "Customer's document", example = "12345678900")
             @PathVariable @NotBlank String document,

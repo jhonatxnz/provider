@@ -52,7 +52,6 @@ class CustomersControllerIT {
     @Test
     @DisplayName("getCustomerByUsername returns customer by username when successful")
     void getByUsername_ReturnsCustomerByUsername_WhenSuccessful() {
-
         Customers savedCustomer = customersRepository.save(CustomerCreator.createCustomerToBeSaved());
 
         ResponseEntity<CustomerResponse> response = testRestTemplate.exchange(
@@ -70,7 +69,6 @@ class CustomersControllerIT {
     @Test
     @DisplayName("getCustomerByDocument returns customer by document when successful")
     void getByDocument_ReturnsCustomerByDocument_WhenSuccessful() {
-
         Customers savedCustomer = customersRepository.save(CustomerCreator.createCustomerToBeSaved());
 
         ResponseEntity<CustomerResponse> response = testRestTemplate.exchange(
@@ -115,7 +113,7 @@ class CustomersControllerIT {
         CustomerUpdateRequest customerUpdateRequest = CustomerUpdateRequestCreator.createCustomerUpdateRequest(savedCustomer);
 
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
-                RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getUsername(),
+                RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument(),
                 HttpMethod.PUT,
                 new HttpEntity<>(customerUpdateRequest),
                 new ParameterizedTypeReference<StatusResponse>() {}
@@ -189,5 +187,4 @@ class CustomersControllerIT {
 
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
-
 }

@@ -10,4 +10,6 @@ import java.util.List;
 public interface CustomerSubscriptionsRepository extends JpaRepository<CustomerSubscriptions, Long> {
 
    List<CustomerSubscriptions> findByCustomerId(Long customerId);
+
+   List<CustomerSubscriptions> findByCustomerIdAndStatus(Long customerId, String status);
 }

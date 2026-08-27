@@ -106,7 +106,7 @@ class CustomersControllerTest {
                         .statusCode("200")
                         .build()));
 
-        StatusResponse response = customersController.updateCustomer(expectedCustomer.getUsername(), customerUpdateRequest).getBody();
+        StatusResponse response = customersController.updateCustomer(expectedCustomer.getDocument(), customerUpdateRequest).getBody();
 
         Assertions.assertThat(response).isNotNull();
         Assertions.assertThat(response.getStatusCode()).isEqualTo("200");

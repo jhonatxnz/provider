@@ -8,7 +8,6 @@ public class CustomerUpdateRequestCreator {
     public static CustomerUpdateRequest createCustomerUpdateRequest(Customers customer) {
 
         return CustomerUpdateRequest.builder()
-                .document(customer.getDocument())
                 .name(customer.getName())
                 .email(customer.getEmail())
                 .phone(customer.getPhone())

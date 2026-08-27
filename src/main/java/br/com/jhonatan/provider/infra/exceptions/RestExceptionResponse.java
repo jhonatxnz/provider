@@ -1,4 +1,4 @@
-package br.com.jhonatan.provider.infra;
+package br.com.jhonatan.provider.infra.exceptions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;

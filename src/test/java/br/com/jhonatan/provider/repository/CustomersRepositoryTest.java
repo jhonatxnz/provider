@@ -31,7 +31,6 @@ class CustomersRepositoryTest {
         Assertions.assertThat(savedCustomer.getId()).isNotNull();
 
         Assertions.assertThat(savedCustomer.getUsername()).isEqualTo(customerToBeSaved.getUsername());
-
     }
 
     @Test
@@ -51,7 +50,6 @@ class CustomersRepositoryTest {
         Assertions.assertThat(updatedCustomer.getId()).isNotNull();
 
         Assertions.assertThat(updatedCustomer.getName()).isEqualTo(updatedCustomer.getName());
-
     }
 
     @Test
@@ -67,7 +65,6 @@ class CustomersRepositoryTest {
         Optional<Customers> customerOptional = this.customersRepository.findById(savedCustomer.getId());
 
         Assertions.assertThat(customerOptional).isEmpty();
-
     }
 
     @Test
@@ -89,11 +86,9 @@ class CustomersRepositoryTest {
     @Test
     @DisplayName("Find by username returns empty when no subscription is found")
     void findByUsername_ReturnsEmpty_WhenSuccessful() {
-
         Optional<Customers> customer = this.customersRepository.findByUsername("NotExistingUsername");
 
         Assertions.assertThat(customer).isEmpty();
-
     }
 
     @Test
@@ -115,22 +110,17 @@ class CustomersRepositoryTest {
     @Test
     @DisplayName("Find by document returns empty when no customer is found")
     void findByDocument_ReturnsEmpty_WhenSuccessful() {
-
         Optional<Customers> customer = this.customersRepository.findByDocument("00000000000");
 
         Assertions.assertThat(customer).isEmpty();
-
     }
 
     @Test
     @DisplayName("Save throw ConstraintViolationException when name is empty")
     void save_ThrowDataIntegrityViolationException_WhenNameIsEmpty() {
-
         Customers customer = new Customers();
 
         Assertions.assertThatThrownBy(() -> this.customersRepository.save(customer))
                 .isInstanceOf(ConstraintViolationException.class);
-
     }
-
 }

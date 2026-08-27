@@ -71,6 +71,7 @@ public class SubscriptionsController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Subscription removed successfully",
                     content = @Content(schema = @Schema(implementation = StatusResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid data"),
             @ApiResponse(responseCode = "404", description = "Customer or subscription not found")
     })
     @DeleteMapping("/{subscription}")

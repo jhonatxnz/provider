@@ -14,8 +14,10 @@ import br.com.jhonatan.provider.model.Customers;
 import br.com.jhonatan.provider.repository.SubscriptionsRepository;
 import br.com.jhonatan.provider.repository.CustomerSubscriptionsRepository;
 import br.com.jhonatan.provider.repository.CustomersRepository;
+import br.com.jhonatan.provider.utils.DocumentUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     @Override
     public List<SubscriptionResponse> list(String document) {
 
+        document = DocumentUtils.cleanDocument(document);
+
         Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
 
         List<CustomerSubscriptions> subscriptions = customerSubscriptionsRepository.findByCustomerId(customer.getId());
@@ -63,6 +67,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
     @Override
     public ResponseEntity<StatusResponse> subscribe(String document, String code) {
+
+        document = DocumentUtils.cleanDocument(document);
 
         log.info("Starting subscribe process for customer {}, subscription {}", document, code);
 
@@ -133,7 +139,13 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
                     .phone(customer.getPhone())
                     .build();
 
-            customerSubscriptionsRepository.save(newSubscription);
+            try {
+                customerSubscriptionsRepository.save(newSubscription);
+                customerSubscriptionsRepository.flush();
+            } catch (DataIntegrityViolationException e) {
+                log.warn("Concurrent subscription creation detected for customer {}, subscription {}", document, code);
+                throw new CustomerAlreadyHasSubscription();
+            }
 
             subscriptionEventProducer.publishSubscriptionCreated(
                     SubscriptionCreatedEvent.builder()
@@ -157,6 +169,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
     @Override
     public ResponseEntity<StatusResponse> cancel(String document, String code) {
+
+        document = DocumentUtils.cleanDocument(document);
 
         log.info("Starting cancel process for customer {}, subscription {}", document, code);
 
@@ -182,7 +196,7 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
 
         customerSubscriptionsRepository.save(subscriptionToCancel);
 
-        subscriptionEventProducer.publishSubscriptionDeleted(
+        subscriptionEventProducer.publishSubscriptionCanceled(
                 SubscriptionCanceledEvent.builder()
                         .customerEmail(customer.getEmail())
                         .customerName(customer.getName())

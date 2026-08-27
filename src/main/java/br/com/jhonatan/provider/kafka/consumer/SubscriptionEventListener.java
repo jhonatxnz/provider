@@ -21,11 +21,12 @@ public class SubscriptionEventListener {
     public void handleSubscriptionCreated(SubscriptionCreatedEvent event) {
         log.info("Sending confirmation email to {}", event.getCustomerEmail());
 
-        emailService.sendSubscriptionConfirmation(
-                event.getCustomerEmail(),
-                event.getCustomerName(),
-                event.getSubscriptionCode()
-        );
+//        https://myaccount.google.com/apppasswords configure
+//        emailService.sendSubscriptionConfirmation(
+//                event.getCustomerEmail(),
+//                event.getCustomerName(),
+//                event.getSubscriptionCode()
+//        );
     }
 
     //Read and process message, listening in topic subscription.canceled, then send email
@@ -33,11 +34,12 @@ public class SubscriptionEventListener {
     public void handleSubscriptionCanceled(SubscriptionCanceledEvent event) {
         log.info("Sending warning cancellation email to {}", event.getCustomerEmail());
 
-        emailService.sendSubscriptionCancellation(
-                event.getCustomerEmail(),
-                event.getCustomerName(),
-                event.getSubscriptionCode()
-        );
+//        https://myaccount.google.com/apppasswords configure
+//        emailService.sendSubscriptionCancellation(
+//                event.getCustomerEmail(),
+//                event.getCustomerName(),
+//                event.getSubscriptionCode()
+//        );
     }
 
     //Read and process message, listening in topic subscription.reactivated, then send email
@@ -45,10 +47,11 @@ public class SubscriptionEventListener {
     public void handleSubscriptionReactivated(SubscriptionReactivatedEvent event) {
         log.info("Sending warning reactivation email to {}", event.getCustomerEmail());
 
-        emailService.sendSubscriptionReactivation(
-                event.getCustomerEmail(),
-                event.getCustomerName(),
-                event.getSubscriptionCode()
-        );
+//        https://myaccount.google.com/apppasswords configure
+//        emailService.sendSubscriptionReactivation(
+//                event.getCustomerEmail(),
+//                event.getCustomerName(),
+//                event.getSubscriptionCode()
+//        );
     }
 }
