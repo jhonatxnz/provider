@@ -82,9 +82,12 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-//	prometheus
-//
-//	grafana
+	// --- Spring boot Actuator
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
 //
 //	opensearch
 //

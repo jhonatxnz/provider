@@ -60,3 +60,18 @@ spring:
           auth: true
           starttls:
             enable: true
+
+management:
+  health:
+    mail:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: info,health,metrics,prometheus
+  info:
+    env:
+      enabled: true
+
+info:
+  app: Provider API
