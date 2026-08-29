@@ -69,7 +69,7 @@ public class CustomersServiceImpl implements CustomersService {
     @Override
     public ResponseEntity<StatusResponse> create(CustomerRequest customerRequest) {
 
-        log.info("Starting customer creation");
+        log.info("Starting customer creation - {}", customerRequest.getDocument());
 
         String customerDocument = DocumentUtils.cleanDocument(customerRequest.getDocument());
 

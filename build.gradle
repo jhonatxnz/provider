@@ -78,6 +78,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
+	implementation 'org.apache.logging.log4j:log4j-layout-template-json'
+
 	// --- Email service --
 
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -88,16 +90,9 @@ dependencies {
 
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
-//
-//	opensearch
-//
-//	elasticsearch
-//
 //	authentication
 //
 //  security token
-//
-//  history table
 
 }
 
