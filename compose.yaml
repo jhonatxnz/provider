@@ -3,10 +3,10 @@ services:
   mysql:
     image: 'mysql:8.4'
     environment:
-      - 'MYSQL_DATABASE=provider_db' #should be in an .env file
-      - 'MYSQL_USER=provider_user' #should be in an .env file
-      - 'MYSQL_PASSWORD=provider_pass' #should be in an .env file
-      - 'MYSQL_ROOT_PASSWORD=root' #should be in an .env file
+      - 'MYSQL_DATABASE=provider_db'
+      - 'MYSQL_USER=provider_user'
+      - 'MYSQL_PASSWORD=${MYSQL_PASSWORD}' #should be in an .env file
+      - 'MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}' #should be in an .env file
     ports:
       - '3308:3306'
 
@@ -50,7 +50,7 @@ services:
       - '3000:3000'
     environment:
       - 'GF_SECURITY_ADMIN_USER=admin'
-      - 'GF_SECURITY_ADMIN_PASSWORD=admin'
+      - 'GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}' #should be in an .env file
     volumes:
       - 'grafana-data:/var/lib/grafana'
     depends_on:
@@ -62,7 +62,7 @@ services:
       - 'discovery.type=single-node'
       - 'plugins.security.disabled=true'
       - 'OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m'
-      - 'OPENSEARCH_INITIAL_ADMIN_PASSWORD=Provider123!'
+      - 'OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_ADMIN_PASSWORD}' #should be in an .env file
     ports:
       - '9200:9200'
     volumes:
