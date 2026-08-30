@@ -3,17 +3,13 @@ services:
   mysql:
     image: 'mysql:8.4'
     environment:
-      - 'MYSQL_DATABASE=provider_db'
-      - 'MYSQL_USER=provider_user'
-      - 'MYSQL_PASSWORD=provider_pass'
-      - 'MYSQL_ROOT_PASSWORD=root'
+      - 'MYSQL_DATABASE=provider_db' #should be in an .env file
+      - 'MYSQL_USER=provider_user' #should be in an .env file
+      - 'MYSQL_PASSWORD=provider_pass' #should be in an .env file
+      - 'MYSQL_ROOT_PASSWORD=root' #should be in an .env file
     ports:
       - '3308:3306'
 
-  # Note: Spring Boot's Docker Compose Support doesn't create the Kafka connection
-  # automatically today (no native "service connection"), unlike MySQL.
-  # The bootstrap-servers in application.yml (localhost:9092) already matches the
-  # port exposed here, so no extra configuration is needed.
   kafka:
     image: 'apache/kafka:latest'
     ports:

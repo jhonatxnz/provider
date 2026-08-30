@@ -127,6 +127,13 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
+    protected ResponseEntity<RestExceptionResponse> invalidClientCredentialsHandler(InvalidClientCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                new RestExceptionResponse("error", e.getMessage(), "401")
+        );
+    }
+
+    @ExceptionHandler
     protected ResponseEntity<RestExceptionResponse> genericExceptionHandler(Exception e) {
         return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
                 new RestExceptionResponse(

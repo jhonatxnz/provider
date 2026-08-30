@@ -49,6 +49,8 @@ public class SubscriptionsServiceImpl implements SubscriptionsService {
     @Override
     public List<SubscriptionResponse> list(String document) {
 
+        System.out.println(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("Consumer-Secret-2026!"));
+
         document = DocumentUtils.cleanDocument(document);
 
         Customers customer = customersRepository.findByDocument(document).orElseThrow(CustomerNotFoundException::new);
