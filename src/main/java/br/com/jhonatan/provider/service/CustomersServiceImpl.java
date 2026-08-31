@@ -54,7 +54,9 @@ public class CustomersServiceImpl implements CustomersService {
     @Override
     public CustomerResponse getByDocument(String document) {
 
-        Customers customer = customersRepository.findByDocument(document)
+        String cleanedDocument = DocumentUtils.cleanDocument(document);
+
+        Customers customer = customersRepository.findByDocument(cleanedDocument)
                 .orElseThrow(CustomerNotFoundException::new);
 
         return CustomerResponse.builder()
@@ -115,7 +117,9 @@ public class CustomersServiceImpl implements CustomersService {
 
         log.info("Updating customer with document {}", document);
 
-        Customers customer = customersRepository.findByDocument(document)
+        String cleanedDocument = DocumentUtils.cleanDocument(document);
+
+        Customers customer = customersRepository.findByDocument(cleanedDocument)
                 .orElseThrow(CustomerNotFoundException::new);
 
         if (!NameUtils.isValidName(customerUpdateRequest.getName()))

@@ -13,6 +13,7 @@ import br.com.jhonatan.provider.repository.CustomersRepository;
 import br.com.jhonatan.provider.repository.SubscriptionsRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,27 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 import util.CustomerCreator;
 import util.CustomerSubscriptionCreator;
 import util.SubscriptionCreator;
 import util.SubscriptionRequestCreator;
 
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest(classes = ProviderApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestRestTemplate
 @AutoConfigureTestDatabase
+@ActiveProfiles("test")
 class SubscriptionsControllerIT {
+
+    private static final String TEST_CLIENT_ID = "consumer-api";
+    private static final String TEST_CLIENT_SECRET = "test-secret-1234";
 
     @Autowired
     private TestRestTemplate testRestTemplate;
@@ -53,11 +61,43 @@ class SubscriptionsControllerIT {
     @Autowired
     private CustomerSubscriptionsRepository customerSubscriptionsRepository;
 
+    private String token;
+
+    @BeforeEach
+    void authenticate() {
+        Map<String, String> tokenRequest = Map.of(
+                "clientId", TEST_CLIENT_ID,
+                "clientSecret", TEST_CLIENT_SECRET
+        );
+
+        ResponseEntity<Map> response = testRestTemplate.postForEntity(
+                RestControllerUrlBase.BASE_URL + "/auth/token",
+                tokenRequest,
+                Map.class
+        );
+
+        token = (String) response.getBody().get("accessToken");
+    }
+
     @AfterEach
     void tearDown() {
         customerSubscriptionsRepository.deleteAll();
         subscriptionsRepository.deleteAll();
         customersRepository.deleteAll();
+    }
+
+    private HttpHeaders authHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        return headers;
+    }
+
+    private <T> HttpEntity<T> entity(T body) {
+        return new HttpEntity<>(body, authHeaders());
+    }
+
+    private HttpEntity<Void> entity() {
+        return new HttpEntity<>(null, authHeaders());
     }
 
     @Test
@@ -73,16 +113,14 @@ class SubscriptionsControllerIT {
         ResponseEntity<List<SubscriptionResponse>> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument() + "/subscriptions",
                 HttpMethod.GET,
-                null,
+                entity(),
                 new ParameterizedTypeReference<List<SubscriptionResponse>>() {}
         );
 
         Assertions.assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-
         Assertions.assertThat(response.getBody())
                 .isNotNull()
                 .hasSize(1);
-
         Assertions.assertThat(response.getBody().getFirst().getName()).isEqualTo(savedSubscription.getName());
     }
 
@@ -94,7 +132,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<List<SubscriptionResponse>> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument() + "/subscriptions",
                 HttpMethod.GET,
-                null,
+                entity(),
                 new ParameterizedTypeReference<List<SubscriptionResponse>>() {}
         );
 
@@ -108,7 +146,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/00000000000/subscriptions",
                 HttpMethod.GET,
-                null,
+                entity(),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -126,7 +164,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument() + "/subscriptions",
                 HttpMethod.POST,
-                new HttpEntity<>(subscriptionRequest),
+                entity(subscriptionRequest),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -150,7 +188,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument() + "/subscriptions",
                 HttpMethod.POST,
-                new HttpEntity<>(subscriptionRequest),
+                entity(subscriptionRequest),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -169,7 +207,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument() + "/subscriptions",
                 HttpMethod.POST,
-                new HttpEntity<>(subscriptionRequest),
+                entity(subscriptionRequest),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -186,7 +224,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/00000000000/subscriptions",
                 HttpMethod.POST,
-                new HttpEntity<>(subscriptionRequest),
+                entity(subscriptionRequest),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -207,7 +245,7 @@ class SubscriptionsControllerIT {
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument()
                         + "/subscriptions/" + savedSubscription.getCode(),
                 HttpMethod.DELETE,
-                null,
+                entity(),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -224,7 +262,7 @@ class SubscriptionsControllerIT {
 
         CustomerSubscriptions canceledSubscription =
                 CustomerSubscriptionCreator.createCustomerSubscriptionToBeSaved(savedCustomer, savedSubscription);
-        canceledSubscription.setStatus("0"); // '0' - inactive/already canceled
+        canceledSubscription.setStatus("0");
 
         customerSubscriptionsRepository.save(canceledSubscription);
 
@@ -232,7 +270,7 @@ class SubscriptionsControllerIT {
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument()
                         + "/subscriptions/" + savedSubscription.getCode(),
                 HttpMethod.DELETE,
-                null,
+                entity(),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -249,7 +287,7 @@ class SubscriptionsControllerIT {
                 RestControllerUrlBase.BASE_URL + "/customers/" + savedCustomer.getDocument()
                         + "/subscriptions/" + savedSubscription.getCode(),
                 HttpMethod.DELETE,
-                null,
+                entity(),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 
@@ -264,7 +302,7 @@ class SubscriptionsControllerIT {
         ResponseEntity<StatusResponse> response = testRestTemplate.exchange(
                 RestControllerUrlBase.BASE_URL + "/customers/00000000000/subscriptions/" + savedSubscription.getCode(),
                 HttpMethod.DELETE,
-                null,
+                entity(),
                 new ParameterizedTypeReference<StatusResponse>() {}
         );
 

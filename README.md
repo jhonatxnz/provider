@@ -1,85 +1,163 @@
-# provider
+# Provider API
 
-Java + Spring Boot API skeleton, generated without a CRUD example (just the package structure).
+Java + Spring Boot service that owns customer registration and subscription management. It exposes a
+JWT-secured REST API consumed by the `consumer` API, publishes subscription lifecycle events to Kafka,
+and ships a full local observability stack (metrics, logs, dashboards) via Docker Compose.
 
 ## Stack
 
-| Item | Version / detail |
+| Layer | Technology |
 |---|---|
-| Java | 21 (LTS) — Spring Boot 4.x requires Java 17+ |
-| Spring Boot | 4.1.0 |
-| Build | Gradle 9.7.0 (via wrapper, `./gradlew`) |
-| Web | `spring-boot-starter-webmvc` (renamed from the old `spring-boot-starter-web` in Boot 4) |
-| Persistence | `spring-boot-starter-data-jpa` + MySQL driver (`com.mysql:mysql-connector-j`) |
-| Messaging | `spring-boot-starter-kafka` (Spring for Apache Kafka) |
-| Lombok | `org.projectlombok:lombok` |
-| Docs | `springdoc-openapi-starter-webmvc-ui` (Swagger UI + OpenAPI 3, works with no extra config) |
-| Dev | Docker Compose Support (`spring-boot-docker-compose`, `developmentOnly` scope) |
-
-> Spring Boot 4 renamed several starters (e.g. `spring-boot-starter-web` → `spring-boot-starter-webmvc`,
-> `spring-boot-starter-kafka` as a dedicated starter). I used the current Boot 4.1 names; if you
-> ever migrate to Boot 3.x, swap `spring-boot-starter-webmvc` back for `spring-boot-starter-web`.
+| Language / runtime | Java 21 (LTS) |
+| Framework | Spring Boot 4.1.0 |
+| Build | Gradle 9.7 (wrapper, `./gradlew`) |
+| Web | `spring-boot-starter-webmvc` |
+| Persistence | Spring Data JPA + MySQL 8.4 (`com.mysql:mysql-connector-j`) |
+| Messaging | Spring for Apache Kafka (`spring-boot-starter-kafka`) |
+| Auth | Spring Security + JJWT (`io.jsonwebtoken:jjwt`) — stateless client-credentials JWT flow |
+| API docs | springdoc-openapi (Swagger UI + OpenAPI 3) |
+| Email | Spring Mail (`JavaMailSender`, SMTP) |
+| Observability | Spring Boot Actuator + Micrometer (Prometheus registry) |
+| Logging | Log4j2, console + JSON file appender (Logstash layout) |
+| Log shipping | Fluent Bit → OpenSearch → OpenSearch Dashboards |
+| Local infra | Docker Compose (MySQL, Kafka, Kafka UI, Prometheus, Grafana, OpenSearch, OpenSearch Dashboards, Fluent Bit) |
+| Object mapping / boilerplate | Lombok |
+| Tests | JUnit 5, Spring Boot Test (web, data-jpa, kafka slices), integration tests under `src/test/java/integration` |
 
 ## Package structure
 
 ```
 br.com.jhonatan.provider
-├── config       # @Configuration (beans, CORS, security, etc.)
-├── controller   # @RestController
-├── service      # business logic
-├── repository   # Spring Data JPA repositories
-├── model        # JPA entities
-├── dto          # transfer objects (request/response)
-├── exception    # custom exceptions + @ControllerAdvice
-└── kafka
-    ├── producer
-    ├── consumer
-    └── config   # @Configuration specific to topics/serializers
+├── config              # OpenAPI/Swagger configuration
+├── controller           # @RestController (customers, subscriptions, auth)
+├── dto                  # request/response payloads
+├── enums                 # SubscriptionStatus, Actions
+├── event                 # Kafka event payloads
+├── exception              # domain exceptions
+├── infra
+│   ├── exceptions        # @RestControllerAdvice + error response (active handler)
+│   └── security           # JwtService, JwtAuthenticationFilter, SecurityConfig, SecurityProperties
+├── kafka
+│   ├── config             # topic declarations
+│   ├── consumer           # @KafkaListener (subscription lifecycle → email)
+│   └── producer            # publishes subscription lifecycle events
+├── model                 # JPA entities
+├── repository             # Spring Data JPA repositories
+├── service                # business logic
+└── utils                  # document/email/name/phone validation & normalization
 ```
 
-`config`, `exception` and the `kafka` sub-packages are still empty (just `.gitkeep`). `model`, `dto`,
-`repository`, `service` and `controller` already have the skeleton for the customers/subscriptions
-endpoints — the service implementations just throw `UnsupportedOperationException("TODO: ...")` for now,
-which is where you plug in the real logic.
+## Prerequisites
 
-## Running locally (without Docker for now)
+- JDK 21
+- Docker + Docker Compose (the app drives `compose.yaml` for you via Spring Boot's Docker Compose
+  support — you don't need to run `docker compose up` manually)
 
-⚠️ While Docker isn't installed, `application.yml` has:
+## Configuration
 
-- `spring.docker.compose.enabled: false` — prevents Spring from trying to run `docker compose up`
-  on its own (which would fail without Docker installed).
-- The datasource pointing at **in-memory H2** instead of MySQL, just so the app can start without
-  needing a real database.
+Two layers of configuration are used:
 
-So:
+1. **`.env`** (project root, already git-ignored) — consumed by `compose.yaml` for the containers'
+   own credentials:
+
+   ```
+   MYSQL_PASSWORD=...
+   MYSQL_ROOT_PASSWORD=...
+   OPENSEARCH_ADMIN_PASSWORD=...
+   GRAFANA_ADMIN_PASSWORD=...
+   ```
+
+2. **Application environment variables** (set them in your IDE run configuration, shell profile, or a
+   second `.env` loaded by your IDE) — consumed directly by `application.yml`:
+
+   | Variable | Purpose | Notes |
+   |---|---|---|
+   | `SERVER_PORT` | HTTP port | defaults to `8080` |
+   | `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` | MySQL connection | defaults match `compose.yaml` |
+   | `SPRING_KAFKA_BOOTSTRAP_SERVERS` | Kafka broker | defaults to `localhost:9092` |
+   | `MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD` | SMTP for outgoing email | for Gmail, `MAIL_PASSWORD` must be an [app password](https://myaccount.google.com/apppasswords), not your login password |
+   | `JWT_SECRET` | HMAC signing key for issued JWTs | **required, no default** — pick a long random string (32+ bytes) |
+   | `CONSUMER_CLIENT_SECRET` | credential for the `consumer-api` client | **must be stored as a BCrypt hash**, since `AuthController` validates it with `PasswordEncoder.matches(raw, stored)` — encode the plaintext secret once (e.g. `new BCryptPasswordEncoder().encode("your-secret")`) and put the hash here, never the plaintext |
+
+   Since `JWT_SECRET` and `CONSUMER_CLIENT_SECRET` have no defaults in `application.yml`, the app
+   **will fail to start** if they're missing — that's intentional (fail-fast instead of running with a
+   predictable/empty secret).
+
+## Running locally
 
 ```bash
 ./gradlew bootRun
 ```
 
-...should start without errors (Kafka doesn't block startup since there's no `@KafkaListener`
-or topic configured yet — the connection is only attempted once you actually publish/consume something).
+Spring Boot's Docker Compose integration brings up every service declared in `compose.yaml`
+automatically (MySQL gets automatic service connection — host/port/credentials are wired into the
+`DataSource` for you). First boot creates the schema via Hibernate (`ddl-auto: update`).
 
-### Once Docker is installed
+| Service | URL | Notes |
+|---|---|---|
+| Provider API | http://localhost:8080 | |
+| Swagger UI | http://localhost:8080/swagger-ui.html | |
+| OpenAPI JSON | http://localhost:8080/v3/api-docs | |
+| MySQL | localhost:3308 | mapped from container port 3306 |
+| Kafka | localhost:9092 | |
+| Kafka UI | http://localhost:8083 | topic/message inspector |
+| Prometheus | http://localhost:9090 | scrapes `/actuator/prometheus` every 15s |
+| Grafana | http://localhost:3000 | login `admin` / `$GRAFANA_ADMIN_PASSWORD` |
+| OpenSearch | http://localhost:9200 | |
+| OpenSearch Dashboards | http://localhost:5601 | receives app logs shipped by Fluent Bit |
 
-In `application.yml`:
+> For production, switch `spring.jpa.hibernate.ddl-auto` from `update` to `validate`/`none` and manage
+> the schema with a migration tool (Flyway/Liquibase) — `ddl-auto: update` is convenient for local dev
+> only.
 
-1. Delete (or set to `true`) `spring.docker.compose.enabled: false`.
-2. Comment out the H2 datasource block and uncomment the MySQL block right below it.
-3. Run `./gradlew bootRun` again — Spring Boot will bring up MySQL and Kafka from
-   `compose.yaml` automatically.
+## Authentication
 
-- MySQL has **automatic service connection**: Spring Boot discovers the container's host/port/credentials
-  and configures the `DataSource` on its own.
-- Kafka doesn't have that native auto-connection yet, so the `bootstrap-servers` in
-  `application.yml` (`localhost:9092`) is already aligned with the port exposed in `compose.yaml`.
+The API uses a stateless, service-to-service **client-credentials** flow:
 
-## API docs (Swagger / OpenAPI)
+1. `POST /api/auth/token` with `{ "clientId": "consumer-api", "clientSecret": "..." }` (the plaintext
+   secret, matched server-side against the configured BCrypt hash).
+2. Response: a Bearer JWT (`accessToken`), valid for `security.jwt.expiration-ms` (1 hour by default).
+3. Send it as `Authorization: Bearer <token>` on every other request.
 
-With the app running:
+`/api/auth/token`, `/swagger-ui/**`, `/v3/api-docs/**`, `/actuator/health` and `/actuator/prometheus`
+are public; everything else requires a valid token.
 
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+## API overview
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/auth/token` | Issue a JWT for a registered client |
+| `GET` | `/api/customers/{username}` | Fetch a customer by username |
+| `GET` | `/api/customers/document/{document}` | Fetch a customer by document (CPF/CNPJ) |
+| `POST` | `/api/customers` | Register a new customer |
+| `PUT` | `/api/customers/{document}` | Update a customer's name/email/phone |
+| `GET` | `/api/customers/{document}/subscriptions` | List a customer's subscriptions |
+| `POST` | `/api/customers/{document}/subscriptions` | Create (or reactivate) a subscription |
+| `DELETE` | `/api/customers/{document}/subscriptions/{subscription}` | Cancel a subscription |
+
+Full request/response schemas are in Swagger UI once the app is running.
+
+## Events (Kafka)
+
+Subscription lifecycle changes are published as JSON events; topics are auto-created on startup:
+
+| Topic | Published when |
+|---|---|
+| `subscription.created` | a new subscription is activated |
+| `subscription.canceled` | a subscription is canceled |
+| `subscription.reactivated` | a previously canceled subscription is reactivated |
+
+`SubscriptionEventListener` consumes these internally to trigger transactional emails via
+`EmailService`. **The actual `emailService.send...()` calls are currently commented out** pending Gmail
+app-password setup — finish wiring `MAIL_USERNAME`/`MAIL_PASSWORD` and uncomment them once ready.
+
+## Observability
+
+- **Metrics**: Actuator + Micrometer expose `/actuator/prometheus`; Prometheus scrapes it and Grafana
+  reads from Prometheus.
+- **Logs**: Log4j2 writes to the console and to a rolling JSON file (`logs/provider.log`, Logstash
+  layout); Fluent Bit tails that file and ships entries to OpenSearch, browsable in OpenSearch
+  Dashboards.
 
 ## Tests
 
@@ -87,11 +165,5 @@ With the app running:
 ./gradlew test
 ```
 
-## Renaming the project
-
-If you want to rename it again:
-
-1. `settings.gradle` → `rootProject.name`
-2. `build.gradle` → `group`
-3. Package `br.com.jhonatan.provider` (rename the folder and the `package` declaration in every file,
-   including `ProviderApplication.java` and `ProviderApplicationTests.java`)
+Unit tests cover controllers, security (JWT/auth) and repositories; integration tests
+(`src/test/java/integration`) exercise the customers and subscriptions flows end-to-end.

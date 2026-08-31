@@ -12,7 +12,6 @@ import lombok.*;
 public class RestExceptionResponse {
 
     @JsonProperty("status")
-    @Valid
     private String status;
 
     @JsonProperty("message")

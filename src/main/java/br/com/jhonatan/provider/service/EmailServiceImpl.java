@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
         message.setSubject("Reactivated subscription");
         message.setText("Hello " + customerName + ",\n\n"
                 + "Your subscription " + subscriptionCode + " was reactivated.\n\n"
-                + "We will miss you.");
+                + "Welcome back.");
 
         try {
             mailSender.send(message);

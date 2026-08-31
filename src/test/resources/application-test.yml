@@ -1,0 +1,7 @@
+security:
+  jwt:
+    secret: test-secret-key-with-at-least-thirty-two-characters
+    expiration-ms: 3600000
+  clients:
+    - client-id: consumer-api
+      client-secret: $2a$10$nDov2P0LzAamQTqtVtrFWOlVfCN1iu56QxTqM7r/z6NhWrNj859XK
