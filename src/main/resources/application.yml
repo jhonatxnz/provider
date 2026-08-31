@@ -71,4 +71,4 @@ security:
     expiration-ms: 3600000
   clients:
     - client-id: consumer-api
-      client-secret: ${CONSUMER_CLIENT_SECRET} # environment variable configured in ide
+      client-secret: ${CONSUMER_CLIENT_SECRET} # environment variable configured in ide, can be generated using System.out.println(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("pass"));
